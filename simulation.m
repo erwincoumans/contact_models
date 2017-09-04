@@ -14,9 +14,8 @@ ys = r*sin(angles);
 % Initial pose
 x = [0; 0.5; -1; 0; 0; 0];
 ax = axes(); hold on;
-cursor = ax.CurrentPoint(1,1:2);
 disk = plot(xs + r*cos(x(1)), ys + r*sin(x(1)), 'k');
-targ = plot(cursor(1), cursor(2), '+r');
+targ = plot(x(2), x(3), '+r');
 pt = plot(x(2), x(3), 'g.');
 axis([-2 2 -2 2])
 
@@ -26,7 +25,11 @@ kd = 20;
 err_last = 0;
 umax = 10;
 
-pause(1)
+% Wait for user to select target
+cursor = ax.CurrentPoint(1,1:2);
+while (cursor == ax.CurrentPoint(1,1:2))
+    pause(0.1)
+end
 
 while (true)
     cursor = ax.CurrentPoint(1,1:2);
