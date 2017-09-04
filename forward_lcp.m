@@ -20,7 +20,7 @@ ctr_pusher = x(2:3);
 n_hat = (ctr_pusher - ctr_disk)/norm(ctr_pusher - ctr_disk); % normal
 t_hat = [-n_hat(2); n_hat(1)]; % tangent
 psi = norm(ctr_pusher - ctr_disk) - r; % normal distance
-r_vec = ctr_pusher - (psi/2)*n_hat; % midpoint between pusher and closest point on disk
+r_vec = ctr_disk + r*n_hat; % contact location
 % Contact Jacobians
 Gn = [r_vec(2)*n_hat(1) - r_vec(1)*n_hat(2); n_hat];
 Gt = [r_vec(2)*t_hat(1) - r_vec(1)*t_hat(2); t_hat]*D;
