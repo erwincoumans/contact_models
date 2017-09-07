@@ -12,7 +12,7 @@ x = [0, r, 0, 2*r, -2*r, 0, zeros(1,6)]';
 
 % Plotting
 lims = [-4 4 -1 5]*r;
-ax = axes(); hold on;
+clf
 patch(lims([1 2 2 1]), [lims([3 3]) 0 0], 0.8+[0 0 0]);
 h_x1 = line(x(4)+[0 0], x(6)+[0 3*r], 'Color', 'k', 'LineWidth', 2);
 h_x2 = line(x(5)+[0 0], x(6)+[0 3*r], 'Color', 'k', 'LineWidth', 2);
