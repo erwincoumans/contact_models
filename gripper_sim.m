@@ -5,9 +5,9 @@ function y = gripper_sim(x, u)
 % System parameters
 h = 0.02;
 mu = [0.3; 0.3; 0.2];
-m = 0.2;
+m = 0.1;
 r = 0.5;
-m_g = 1;
+m_g = 0.8;
 
 M = diag([m m 0.5*m*r^2 m_g m_g 2*m_g]);
 
