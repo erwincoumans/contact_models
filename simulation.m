@@ -1,56 +1,44 @@
 % Parameters
 h = 0.02;
-mu = 0.3;
-m = 0.2;
 r = 0.5;
-m_p = 1;
-params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_p', m_p);
 
 % Disk
-angles = linspace(0, 2*pi, 20);
+angles = linspace(0, 2*pi, 30);
 xs = r*cos(angles);
 ys = r*sin(angles);
 
 % Initial pose
-x = [0; 0.5; -1; 0; 0; 0];
+x = [0, r, 0, 2*r, -2*r, 0, zeros(1,6)]';
+
+% Plotting
+lims = [-4 4 -1 5]*r;
 ax = axes(); hold on;
-disk = plot(xs + r*cos(x(1)), ys + r*sin(x(1)), 'k');
-targ = plot(x(2), x(3), '+r');
-pt = plot(x(2), x(3), 'g.');
-axis([-2 2 -2 2])
+patch(lims([1 2 2 1]), [lims([3 3]) 0 0], 0.8+[0 0 0]);
+h_x1 = line(x(4)+[0 0], x(6)+[0 3*r], 'Color', 'k', 'LineWidth', 2);
+h_x2 = line(x(5)+[0 0], x(6)+[0 3*r], 'Color', 'k', 'LineWidth', 2);
+h_ceil = patch([-2 2 2 -2]*r, x(6)+[3 3 4 4]*r, 'k');
+h_disk = patch(x(1) + xs, x(2) + ys, 0.8+[0 0 0]);
+h_tick = line(x(1)+[0 r*cos(x(3))], x(2)+[0 r*sin(x(3))], 'Color', 'k', 'LineStyle', '--');
+axis(lims)
 
-% PD control
-kp = 100;
-kd = 20;
-err_last = 0;
-umax = 10;
+% Fixed control input
+u = [-4 4 2]';
 
-% Wait for user to select target
-cursor = ax.CurrentPoint(1,1:2);
-while (cursor == ax.CurrentPoint(1,1:2))
-    pause(0.1)
-end
-
-while (true)
-    cursor = ax.CurrentPoint(1,1:2);
-    
-    % PD control
-    err = x(2:3) - cursor(:);
-    u = -kp*err - kd*(err - err_last)/h;
-    u = max(min(u, umax), -umax);
-    err_last = err;
-    
+for k = 1:100
     % Dynamics
-    x = forward_lcp(params, x, u);
+    x = gripper_sim(x, u);
     
     % Plotting
-    disk.XData = xs + r*cos(x(1));
-    disk.YData = ys + r*sin(x(1));
-    targ.XData = cursor(1);
-    targ.YData = cursor(2);
-    pt.XData = x(2);
-    pt.YData = x(3);
-    axis([-2 2 -2 2])
+    h_x1.XData = x(4)+[0 0];
+    h_x1.YData = x(6)+[0 3*r];
+    h_x2.XData = x(5)+[0 0];
+    h_x2.YData = x(6)+[0 3*r];
+    h_ceil.YData = x(6)+[3 3 4 4]*r;
+    h_disk.XData = x(1) + xs;
+    h_disk.YData = x(2) + ys;
+    h_tick.XData = x(1)+[0 r*cos(x(3))];
+    h_tick.YData = x(2)+[0 r*sin(x(3))];
+    axis(lims)
     
     pause(h)
 end

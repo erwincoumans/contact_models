@@ -1,45 +1,42 @@
-function x_next = forward_lcp(params, x, u)
-% q = [th; x; y; w; v_x; v_y]
-h = params.h; % time step (s)
-mu = params.mu; % Coloumb friction
-m = params.m; % disk mass (kg)
-r = params.r; % disk radius (m)
-m_p = params.m_p; % pusher point mass (kg)
+function [q_next, v_next] = forward_lcp(h, M, q_prev, v_prev, Fext, mu, psi, J)
+% Input:
+% h - time step
+% M - inertia matrix [n x n]
+% q_prev - pose [n x 1]
+% v_prev - velocity [n x 1]
+% Fext - gravitational and other forces [n x 1]
+% mu - coefficients of friction [nc x 1]
+% psi - contact normal distances [nl+nc x 1]
+% J - contact Jacobian [nl+2*nc x n ] ... assume 2D
 
-% Fixed matrices
-D = [1 -1];
-E = [1; 1];
-U = mu;
-B = [0 0; 1 0; 0 1];
-M = diag([0.5*m*r^2 m_p m_p]);
+% Matrix dimensions
+nc = size(mu,1);
+nl = size(psi,1) - nc;
 
-ctr_disk = [r*cos(x(1)); r*sin(x(1))];
-ctr_pusher = x(2:3);
-
-% Contact info
-n_hat = (ctr_pusher - ctr_disk)/norm(ctr_pusher - ctr_disk); % normal
-t_hat = [-n_hat(2); n_hat(1)]; % tangent
-psi = norm(ctr_pusher - ctr_disk) - r; % normal distance
-r_vec = ctr_disk + r*n_hat; % contact location
-% Contact Jacobians
-Gn = [r_vec(2)*n_hat(1) - r_vec(1)*n_hat(2); n_hat];
-Gt = [r_vec(2)*t_hat(1) - r_vec(1)*t_hat(2); t_hat]*D;
-
-% Gravity
-g_vec = [-m*9.81*ctr_disk(1); 0; 0]; % pretend the pusher has perfect gravity compensation
+% Exta tangential impulse variables (reversed sign)
+J = [J; -J(nl+nc+1:end,:)];
+E = [eye(nc); eye(nc)];
 
 % Helper variables
-Gnt = M\Gn;
-Gtt = M\Gt;
-kv = x(4:6) + M\(B*u + g_vec)*h;
+U = diag(mu); % [nc x nc]
+A = J*(M\J'); % [nl+2*nc x nl+2*nc]
+A = (A + A')/2; % should be symmetric
+c = J*(v_prev + M\Fext*h); % [nl+2*nc x 1]
 
-% Solve LCP with Lemke's algorithm
-A = [Gn'*Gnt Gn'*Gtt 0; Gt'*Gnt Gt'*Gtt E; U -E' 0];
-b = [Gn'*kv + psi/h; Gt'*kv; 0];
-z = lemke(A,b);
+% Contact smoothing
+cfm = 1e-6;
+A = (A + diag([(cfm/h)*ones(nl+nc,1); zeros(2*nc,1)]));
 
-% Calculate velocity from contact inpulses
-v_next = [Gnt Gtt zeros(3,1)]*z + kv;
-x_next = [x(1:3) + h*v_next; v_next];
+% Constraints
+Mat = [A [zeros(nl+nc,nc); E]
+     zeros(nc, nl) U -E' zeros(nc)];
+vec = [c + [psi/h; zeros(2*nc,1)]; zeros(nc,1)];
+
+% Solve for contact impulses
+z = lemke(Mat, vec);
+
+% Calculate next state from contact inpulses
+v_next = v_prev + M\(J'*z(1:nl+3*nc) + Fext*h);
+q_next = q_prev + h*v_next;
 
 end
