@@ -10,8 +10,8 @@ r = 0.5;
 
 % set up the optimization problem
 DYNCST  = @(x,u,i) sys_dyn_cst(x,u,full_DDP);
-T  = 50; % horizon
-x0 = [0, r, 0, 2*r, -2*r, 0, zeros(1,6)]'; % initial state
+T  = 20; % horizon
+x0 = [0, r, 0, 1.2*r, -1.2*r, 0, zeros(1,6)]'; % initial state
 rng(0);
 u0 = .1*randn(3,T); % initial controls
 % Op.lims  = [-.5 .5;         % wheel angle limits (radians)
@@ -37,6 +37,7 @@ function c = sys_cost(x, u)
 % lu: quadratic cost on controls
 % lf: final cost on distance from target parking configuration
 % lx: running cost on distance from origin to encourage tight turns
+r = 0.5;
 
 final = isnan(u(1,:));
 u(:,final) = 0;
@@ -46,8 +47,7 @@ lu = 1e-6*[1 1 1]*u.^2;
 
 % final cost
 if any(final)
-   llf = sabs(x(2,final) - 1, 0.1);
-%    llf = (x(2,final) - 1).^2;
+   llf = sabs(x(2,final) - (r+0.5), 0.1);
    lf = double(final);
    lf(final) = llf;
 else
@@ -58,7 +58,7 @@ end
 lx = 0;
 lx = lx + 1e-2*sabs(x(4,:)-x(5,:), 0.1);
 lx = lx + 1e-2*sabs(x(4,:)+x(5,:), 0.1);
-lx = lx + 1e-2*sabs(x(2,:) - 1, 0.1);
+lx = lx + 1e-2*sabs(x(2,:) - (r+0.5), 0.1);
 
 % total cost
 c     = lu + lx + lf;
