@@ -39,13 +39,14 @@ J = [ 0  0  0  1 -1  0   % finger1(R)-finger2(L)  (limit)
      -1  0 -r  0  0  0]; % disk-floor   (contact tangent)
 
 % Next pose if contact forces are all zero
-q2 = q + h*(v + M\Fext*h);
-psi2 = [q2(4) - q2(5)
-       r - q2(6)
-       q2(6)
-       q2(4) - (q2(1) + r)
-       (q2(1) - r) - q2(5)
-       q2(2) - r];
+v_next = (v + M\Fext*h);
+q_next = q + h*v_next;
+psi2 = [q_next(4) - q_next(5)
+       r - q_next(6)
+       q_next(6)
+       q_next(4) - (q_next(1) + r)
+       (q_next(1) - r) - q_next(5)
+       q_next(2) - r];
 
 % Active limits and contacts
 l_active = psi2(1:3) < 0.1;
@@ -54,7 +55,9 @@ J = J([l_active; c_active; c_active],:);
 psi = psi([l_active; c_active]);
 mu = mu(c_active);
 
-% Solve contact dynamics
-[q_next, v_next] = forward_lcp(h, M, q, v, Fext, mu, psi, J);
+if (any(l_active) || any(c_active))
+    % Solve contact dynamics
+    [q_next, v_next] = forward_convex(h, M, q, v, Fext, mu, psi, J);
+end
 y = [q_next; v_next];
 end
