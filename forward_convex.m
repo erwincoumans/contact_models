@@ -36,6 +36,7 @@ blt = [c(1:nl+nc,:) + psi/h; zeros(nl+3*nc,1)];
 % Solve for contact impulses
 f = quadprog(A + R, c, Alt, blt, [], [], [], [], [], ...
     optimset('Algorithm', 'interior-point-convex', 'Display', 'off'));
+% f = primal_interior_point(A+R, c, -Alt, -blt, nl, nc);
 
 % Calculate next state from contact inpulses
 v_next = v_prev + M\(J'*f + Fext*h);
