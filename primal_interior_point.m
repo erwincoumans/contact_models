@@ -28,9 +28,9 @@ while (true)
     % Modify constraints if necessary
     s = A*f - b;
     g_vals = -kappa*s.^-1;
-    g_vals(s < 0) = 2*a0*sum(s) + a1;
+    g_vals(s <= 0) = 2*a0*s(s <= 0) + a1;
     h_vals = kappa*s.^-2;
-    h_vals(s < 0) = 2*a0;
+    h_vals(s <= 0) = 2*a0;
     
     % Derivatives
     grad = H*f + c + A'*g_vals;

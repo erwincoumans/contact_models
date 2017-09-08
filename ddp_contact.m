@@ -12,6 +12,7 @@ r = 0.5;
 DYNCST  = @(x,u,i) sys_dyn_cst(x,u,full_DDP);
 T  = 50; % horizon
 x0 = [0, r, 0, 2*r, -2*r, 0, zeros(1,6)]'; % initial state
+rng(0);
 u0 = .1*randn(3,T); % initial controls
 % Op.lims  = [-.5 .5;         % wheel angle limits (radians)
 %              -2  2];        % acceleration limits (m/s^2)
