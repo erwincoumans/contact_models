@@ -1,4 +1,4 @@
-function y = gripper_sim(x, u)
+function y = gripper_step(x, u)
 % x = [q; v]
 % q = [x_disk, y_disk, th_disk, x1_grip, x2_grip, y_grip]
 
@@ -57,7 +57,8 @@ mu = mu(c_active);
 
 if (any(l_active) || any(c_active))
     % Solve contact dynamics
-    [q_next, v_next] = forward_convex(h, M, q, v, Fext, mu, psi, J);
+    [q_next, v_next] = forward_lcp(h, M, q, v, Fext, mu, psi, J);
 end
+
 y = [q_next; v_next];
 end
