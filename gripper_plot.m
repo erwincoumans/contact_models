@@ -1,4 +1,4 @@
-function gripper_plot(x, f)
+function gripper_plot(x, f, filename)
 
 % Parameters
 h = 0.02;
@@ -12,6 +12,7 @@ ys = r*sin(angles);
 % Plotting
 lims = [-4 4 -1 5]*r;
 clf
+hf = gcf;
 patch(lims([1 2 2 1]), [lims([3 3]) 0 0], 0.8+[0 0 0]);
 h_x1 = line(x(4)+[0 0], x(6)+[0 3*r], 'Color', 'k', 'LineWidth', 2);
 h_x2 = line(x(5)+[0 0], x(6)+[0 3*r], 'Color', 'k', 'LineWidth', 2);
@@ -28,6 +29,10 @@ if (nargin >= 2)
     hold off
 end
 axis(lims)
+
+if (nargin < 3)
+    filename = '';
+end
 
 for k = 1:size(x,2)
     % Plotting
@@ -52,6 +57,18 @@ for k = 1:size(x,2)
     end
     axis(lims)
     
-    pause(h)
+    if ~isempty(filename)
+        drawnow
+        frame = getframe(hf);
+        im = frame2im(frame);
+        [im_inds, color_map] = rgb2ind(im, 256);
+        if (k == 1)
+            imwrite(im_inds, color_map, filename, 'gif', 'Loopcount', Inf);
+        else
+            imwrite(im_inds, color_map, filename, 'gif', 'WriteMode', 'append');
+        end
+    else
+        pause(h);
+    end
 end
 end
