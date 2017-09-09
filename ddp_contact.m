@@ -41,7 +41,7 @@ final = isnan(u(1,:));
 u(:,final) = 0;
 
 % control cost
-lu = 1e-6*[1 1 1]*u.^2;
+lu = 1e-5*[1 1 1]*u.^2;
 
 % final cost
 if any(final)
@@ -55,10 +55,10 @@ end
 
 % running cost
 lx = 0;
-lx = lx + 1e-2*sabs(x(4,:)-x(5,:), 0.1);
-lx = lx + 1e-2*sabs(x(4,:)+x(5,:), 0.1);
-% lx = lx + 1e-2*sabs(x(2,:) - (r+0.5), 0.1);
-lx = lx + 1e-3*(x(2,:) - (r+0.5)).^2;
+lx = lx + 0.1*sabs(x(4,:)-x(5,:), 0.1);
+lx = lx + 0.1*sabs(x(4,:)+x(5,:), 0.1);
+lx = lx + 0.1*sabs(x(2,:) - (r+0.5), 0.1);
+% lx = lx + 1e-3*(x(2,:) - (r+0.5)).^2;
 
 % total cost
 c = lu + lx + lf;
