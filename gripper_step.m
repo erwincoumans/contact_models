@@ -1,4 +1,4 @@
-function y = gripper_step(x, u)
+function [y, f] = gripper_step(x, u)
 % x = [q; v]
 % q = [x_disk, y_disk, th_disk, x1_grip, x2_grip, y_grip]
 
@@ -47,6 +47,7 @@ psi2 = [q_next(4) - q_next(5)
        q_next(4) - (q_next(1) + r)
        (q_next(1) - r) - q_next(5)
        q_next(2) - r];
+f = NaN(size(J,1),1);
 
 % Active limits and contacts
 l_active = psi2(1:3) < 0.1;
@@ -57,8 +58,10 @@ mu = mu(c_active);
 
 if (any(l_active) || any(c_active))
     % Solve contact dynamics
-    [q_next, v_next] = forward_lcp(h, M, q, v, Fext, mu, psi, J);
+    [q_next, v_next, f_a] = forward_convex(h, M, q, v, Fext, mu, psi, J);
 end
+
+f([l_active; c_active; c_active])= f_a;
 
 y = [q_next; v_next];
 end

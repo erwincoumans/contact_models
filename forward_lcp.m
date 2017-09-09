@@ -1,4 +1,4 @@
-function [q_next, v_next] = forward_lcp(h, M, q_prev, v_prev, Fext, mu, psi, J)
+function [q_next, v_next, f] = forward_lcp(h, M, q_prev, v_prev, Fext, mu, psi, J)
 % Input:
 % h - time step
 % M - inertia matrix [n x n]
@@ -34,6 +34,8 @@ vec = [c + [psi/h; zeros(2*nc,1)]; zeros(nc,1)];
 
 % Solve for contact impulses
 z = lemke(Mat, vec);
+f = z(1:nl+2*nc);
+f(nl+nc+(1:nc)) = f(nl+nc+(1:nc)) - z(nl+2*nc+(1:nc));
 
 % Calculate next state from contact inpulses
 v_next = v_prev + M\(J'*z(1:nl+3*nc) + Fext*h);

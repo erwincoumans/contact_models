@@ -1,4 +1,4 @@
-function [q_next, v_next] = forward_convex(h, M, q_prev, v_prev, Fext, mu, psi, J)
+function [q_next, v_next, f] = forward_convex(h, M, q_prev, v_prev, Fext, mu, psi, J)
 % Input:
 % h - time step
 % M - inertia matrix [n x n]
