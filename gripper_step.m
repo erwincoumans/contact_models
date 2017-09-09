@@ -59,9 +59,8 @@ mu = mu(c_active);
 if (any(l_active) || any(c_active))
     % Solve contact dynamics
     [q_next, v_next, f_a] = forward_convex(h, M, q, v, Fext, mu, psi, J);
+    f([l_active; c_active; c_active]) = f_a;
 end
-
-f([l_active; c_active; c_active])= f_a;
 
 y = [q_next; v_next];
 end
