@@ -13,13 +13,14 @@ params_ddp.step_fun = @forward_convex;
 
 % set up the optimization problem
 x0 = [0, r, 0, 1.2*r, -1.2*r, 0, zeros(1,6)]'; % initial state
-N  = 31; % horizon
+T = 30; % horizon
 rng(0);
-u0 = 0.1*randn(3,N-1); % initial controls
+u0 = 0.1*randn(3,T); % initial controls
 u0(:,end) = 0;
 
-time = 0:h:h*(N-1);
+time = 0:h:h*T;
 
+N  = 50;
 x = zeros(size(x0,1), N);
 x(:,1) = x0;
 [x_plan, u_plan] = deal(cell(1, N-1));
@@ -36,7 +37,7 @@ z1 = ones(size(time));
 for k = 1:N-1
     plot3(time+(k-1)*h, x_plan{k}(2,:), k*z1, 'Color', [(N-k) (N-k) N]/N)
 end
-plot3(time, x(2,:), 1:N, ':r')
+plot3(0:h:h*(N-1), x(2,:), 1:N, ':r')
 
 grid on
 xlabel('Time (Seconds)')
