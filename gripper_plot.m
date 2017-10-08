@@ -1,8 +1,8 @@
-function gripper_plot(x, f, filename)
+function gripper_plot(params, x, f, filename)
 
 % Parameters
-h = 0.02;
-r = 0.5;
+h = params.h;
+r = params.r;
 
 % Disk
 angles = linspace(0, 2*pi, 30);
@@ -20,7 +20,7 @@ h_ceil = patch([-2 2 2 -2]*r, x(6)+[3 3 4 4]*r, 'k');
 h_disk = patch(x(1) + xs, x(2) + ys, 0.8+[0 0 0]);
 h_tick = line(x(1)+[0 r*cos(x(3))], x(2)+[0 r*sin(x(3))], 'Color', 'k', 'LineStyle', '--');
 h_quiv1 = [];
-if (nargin >= 2)
+if (nargin >= 3)
     hold on
     h_quiv1 = quiver([0 0 x(4) x(5)], [x(6)+4*r x(6)+3*r x(2) x(2)],...
         [0 0 f(4) -f(5)], [-f(2) f(3) f(7) -f(8)], 0, 'b');
@@ -30,7 +30,7 @@ if (nargin >= 2)
 end
 axis(lims)
 
-if (nargin < 3)
+if (nargin < 4)
     filename = '';
 end
 

@@ -1,41 +1,44 @@
-function [x,u] = ddp_contact
-clc;
-close all
+function [x,u] = ddp_contact(params, x0, u0)
 
-% Set full_DDP=true to compute 2nd order derivatives of the 
-% dynamics. This will make iterations more expensive, but 
-% final convergence will be much faster (quadratic)
-full_DDP = false;
-r = 0.5;
+DYNCST  = @(x,u,i) sys_dyn_cst(params, x,u,false);
 
-% set up the optimization problem
-DYNCST  = @(x,u,i) sys_dyn_cst(x,u,full_DDP);
-T  = 30; % horizon
-x0 = [0, r, 0, 1.2*r, -1.2*r, 0, zeros(1,6)]'; % initial state
-rng(0);
-u0 = .1*randn(3,T); % initial controls
-% Op.lims  = [-.5 .5;         % wheel angle limits (radians)
-%              -2  2];        % acceleration limits (m/s^2)
-
-[x,u]= iLQG(DYNCST, x0, u0);
-
-gripper_plot(x);
+op = struct('plot', 0, 'print', 1, 'maxIter', 15);
+if isfield(params,'verbosity')
+    op.plot = params.verbosity;
+    op.print = params.verbosity;
 end
 
-function y = sys_dynamics(x,u)
+% Trajectory visualization callback
+if (op.plot > 0)
+    x1 = repmat(x0,1,size(u0,2)+1);
+    time = 0:params.h:params.h*(size(x1,2)-1);
+    ph = plot(time,x1(2,:),'b',time,x1(4,:)-x1(5,:),'g',time,x1(6,:),'r');
+    xlabel('time (sec)'); ylabel('position (m)');
+    plotFn = @(x) update_plot(ph, x);
+    op.plotFn = plotFn;
+end
+
+[x,u]= iLQG(DYNCST, x0, u0, op);
+
+end
+
+function update_plot(ph, x)
+ph(1).YData = x(2,:);
+ph(2).YData = x(4,:)-x(5,:);
+ph(3).YData = x(6,:);
+end
+
+function y = dyn_fun(params, x,u)
 
 y = NaN(size(x));
 for k = find(~isnan(u(1,:)))
-    y(:,k) = gripper_step(x(:,k), u(:,k));
+    y(:,k) = gripper_step(params, x(:,k), u(:,k));
 end
 end
 
-function c = sys_cost(x, u)
-% cost function consisting of 3 terms:
-% lu: quadratic cost on controls
-% lf: final cost (raise disk)
-% lx: running cost (close and center grasp, raise disk)
-r = 0.5;
+function c = cost_fun(params, x, u)
+
+r = params.r;
 
 final = isnan(u(1,:));
 u(:,final) = 0;
@@ -64,25 +67,20 @@ lx = lx + 0.1*sabs(x(2,:) - (r+0.5), 0.1);
 c = lu + lx + lf;
 end
 
-function y = sabs(x,p)
-% smooth absolute-value function (a.k.a pseudo-Huber)
-y = bsxfun(@plus, sqrt(bsxfun(@plus, x.^2, p.^2)), -p);
-end
-
-function [f,c,fx,fu,fxx,fxu,fuu,cx,cu,cxx,cxu,cuu] = sys_dyn_cst(x,u,full_DDP)
+function [f,c,fx,fu,fxx,fxu,fuu,cx,cu,cxx,cxu,cuu] = sys_dyn_cst(params, x, u, full_DDP)
 % combine dynamics and cost
 % use helper function finite_difference() to compute derivatives
 
 if nargout == 2
-    f = sys_dynamics(x,u);
-    c = sys_cost(x,u);
+    f = dyn_fun(params, x,u);
+    c = cost_fun(params, x,u);
 else
     % state and control indices
     ix = 1:12;
     iu = 13:15;
     
     % dynamics first derivatives
-    xu_dyn  = @(xu) sys_dynamics(xu(ix,:),xu(iu,:));
+    xu_dyn  = @(xu) dyn_fun(params, xu(ix,:),xu(iu,:));
     J       = finite_difference(xu_dyn, [x; u]);
     fx      = J(:,ix,:);
     fu      = J(:,iu,:);
@@ -101,7 +99,7 @@ else
     end    
     
     % cost first derivatives
-    xu_cost = @(xu) sys_cost(xu(ix,:),xu(iu,:));
+    xu_cost = @(xu) cost_fun(params, xu(ix,:),xu(iu,:));
     J       = squeeze(finite_difference(xu_cost, [x; u]));
     cx      = J(ix,:);
     cu      = J(iu,:);
@@ -116,6 +114,11 @@ else
     
     [f,c] = deal([]);
 end
+end
+
+function y = sabs(x,p)
+% smooth absolute-value function (a.k.a pseudo-Huber)
+y = bsxfun(@plus, sqrt(bsxfun(@plus, x.^2, p.^2)), -p);
 end
 
 function J = finite_difference(fun, x, h)

@@ -1,13 +1,14 @@
-function [y, f] = gripper_step(x, u)
+function [y, f] = gripper_step(params, x, u)
 % x = [q; v]
 % q = [x_disk, y_disk, th_disk, x1_grip, x2_grip, y_grip]
 
 % System parameters
-h = 0.02;
-mu = [0.3; 0.3; 0.2];
-m = 0.1;
-r = 0.5;
-m_g = 0.8;
+h = params.h;
+mu = params.mu;
+m = params.m;
+r = params.r;
+m_g = params.m_g;
+step_fun = params.step_fun;
 
 M = diag([m m 0.5*m*r^2 m_g m_g 2*m_g]);
 
@@ -26,6 +27,13 @@ psi = [q(4) - q(5)
        q(4) - (q(1) + r)
        (q(1) - r) - q(5)
        q(2) - r];
+
+%%% dp = [[ 0  0  0  1 -1  0
+%%%         0  0  0  0  0 -1
+%%%         0  0  0  0  0  1
+%%%        -1  0  0  1  0  0
+%%%         1  0  0  0 -1  0
+%%%         0  1  0  0  0  0], zeros(6,6+3)];
 
 % Jacobian for contacts
 J = [ 0  0  0  1 -1  0   % finger1(R)-finger2(L)  (limit)
@@ -54,11 +62,12 @@ l_active = psi2(1:3) < 0.1;
 c_active = psi2(4:6) < 0.1;
 J = J([l_active; c_active; c_active],:);
 psi = psi([l_active; c_active]);
+%%% dp = dp([l_active; c_active],:);
 mu = mu(c_active);
 
 if (any(l_active) || any(c_active))
     % Solve contact dynamics
-    [q_next, v_next, f_a] = forward_convex(h, M, q, v, Fext, mu, psi, J);
+    [q_next, v_next, f_a] = step_fun(h, M, q, v, Fext, mu, psi, J);
     f([l_active; c_active; c_active]) = f_a;
 end
 
