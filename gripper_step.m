@@ -28,13 +28,6 @@ psi = [q(4) - q(5)
        (q(1) - r) - q(5)
        q(2) - r];
 
-%%% dp = [[ 0  0  0  1 -1  0
-%%%         0  0  0  0  0 -1
-%%%         0  0  0  0  0  1
-%%%        -1  0  0  1  0  0
-%%%         1  0  0  0 -1  0
-%%%         0  1  0  0  0  0], zeros(6,6+3)];
-
 % Jacobian for contacts
 J = [ 0  0  0  1 -1  0   % finger1(R)-finger2(L)  (limit)
       0  0  0  0  0 -1   % gripper lift height    (limit)
@@ -62,7 +55,6 @@ l_active = psi2(1:3) < 0.1;
 c_active = psi2(4:6) < 0.1;
 J = J([l_active; c_active; c_active],:);
 psi = psi([l_active; c_active]);
-%%% dp = dp([l_active; c_active],:);
 mu = mu(c_active);
 
 if (any(l_active) || any(c_active))

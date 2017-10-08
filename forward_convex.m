@@ -43,12 +43,4 @@ f = quadprog(A + R, c, Alt, blt, [], [], [], [], [], ...
 v_next = v_prev + M\(J'*f + Fext*h);
 q_next = q_prev + h*v_next;
 
-%%% dp = dp([1:end,nl+1:end],:);
-%%% dr = (Rmin + (Rmax - Rmin)*dp/wmax);
-%%% dc = J*[zeros(6) eye(6) M\[zeros(3); eye(3)]*h];
-%%% Hi = diag(1./diag(A+R));
-%%% df = -Hi.^2*diag(c)*dr + Hi*dc;
-%%% dv = [zeros(6) eye(6) M\[zeros(3); eye(3)]*h] + M\(J'*df);
-%%% dq = [eye(6) zeros(6,6+3)] + h*dv;
-
 end
