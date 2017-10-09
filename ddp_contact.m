@@ -44,7 +44,7 @@ lu = 1e-5*[1 1 1]*u.^2;
 % final cost
 if any(final)
 %    llf = sabs(x(2,final) - (r+0.5), 0.1);
-   llf = (x(2,final) - (r+0.5)).^2;
+   llf = 4*(x(2,final) - (r+0.3)).^2;
    lf = double(final);
    lf(final) = llf;
 else
@@ -55,7 +55,7 @@ end
 lx = 0;
 lx = lx + 0.1*sabs(x(4,:)-x(5,:), 0.1);
 lx = lx + 0.1*sabs(x(4,:)+x(5,:), 0.1);
-lx = lx + 0.1*sabs(x(2,:) - (r+0.5), 0.1);
+lx = lx + 0.2*sabs(x(2,:) - (r+0.3), 0.1);
 % lx = lx + 1e-3*(x(2,:) - (r+0.5)).^2;
 
 % total cost
