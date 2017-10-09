@@ -1,3 +1,5 @@
+% Grasp with MPC (replanning). LCP as reference dynamics.
+
 clear
 close all
 
@@ -9,7 +11,9 @@ r = 0.5;
 m_g = 0.8;
 params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_g', m_g, 'step_fun', @forward_lcp);
 params_ddp = params;
+params_ddp.fd = 1e-3;
 params_ddp.step_fun = @forward_convex;
+op = struct('plot', 0, 'print', 1, 'maxIter', 15);
 
 % set up the optimization problem
 x0 = [0, r, 0, 1.2*r, -1.2*r, 0, zeros(1,6)]'; % initial state
@@ -26,11 +30,12 @@ x(:,1) = x0;
 [x_plan, u_plan] = deal(cell(1, N-1));
 for k = 1:N-1
     fprintf('Step %d\n', k)
-    [x_plan{k}, u_plan{k}] = ddp_contact(params_ddp, x(:,k), u0);
+    [x_plan{k}, u_plan{k}] = ddp_contact(params_ddp, op, x(:,k), u0);
     x(:,k+1) = gripper_step(params, x(:,k), u_plan{k}(:,1));
     u0(:,1:end-1) = u_plan{k}(:,2:end); % warm start
 end
-%%
+
+%% Executed trajectory (red) and plans (blue)
 figure
 hold on
 z1 = ones(size(time));
@@ -48,11 +53,12 @@ for k = 1:numel(a.Children)
 end
 a.FontSize = 14;
 a.FontWeight = 'bold';
-%%
+
+%% Animation
 figure
 gripper_plot(params, x);
 
-
+%% Simulate with different step size
 % rep = 4;
 % 
 % uu = repmat(u,1,1,rep);

@@ -1,15 +1,9 @@
-function [x,u] = ddp_contact(params, x0, u0)
+function [x,u,cst,iter] = ddp_contact(params, op, x0, u0)
 
 DYNCST  = @(x,u,i) sys_dyn_cst(params, x,u,false);
 
-op = struct('plot', 0, 'print', 1, 'maxIter', 15);
-if isfield(params,'verbosity')
-    op.plot = params.verbosity;
-    op.print = params.verbosity;
-end
-
 % Trajectory visualization callback
-if (op.plot > 0)
+if (exist('op','var') && isfield(op,'plot') && (op.plot > 0))
     x1 = repmat(x0,1,size(u0,2)+1);
     time = 0:params.h:params.h*(size(x1,2)-1);
     ph = plot(time,x1(2,:),'b',time,x1(4,:)-x1(5,:),'g',time,x1(6,:),'r');
@@ -18,8 +12,9 @@ if (op.plot > 0)
     op.plotFn = plotFn;
 end
 
-[x,u]= iLQG(DYNCST, x0, u0, op);
-
+[x, u, ~, ~, ~, cost, trace]= iLQG(DYNCST, x0, u0, op);
+cst = sum(cost);
+iter = numel(trace);
 end
 
 function update_plot(ph, x)
@@ -81,7 +76,7 @@ else
     
     % dynamics first derivatives
     xu_dyn  = @(xu) dyn_fun(params, xu(ix,:),xu(iu,:));
-    J       = finite_difference(xu_dyn, [x; u]);
+    J       = finite_difference(xu_dyn, [x; u], params.fd);
     fx      = J(:,ix,:);
     fu      = J(:,iu,:);
     
@@ -126,7 +121,7 @@ function J = finite_difference(fun, x, h)
 % assumes the function fun() is vectorized
 
 if nargin < 3
-    h = 1e-3;%2^-17;
+    h = 7.6294e-06;%2^-17;
 end
 
 [n, K]  = size(x);
