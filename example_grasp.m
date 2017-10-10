@@ -16,9 +16,19 @@ u = [-4 4 2]';
 N = 100;
 [x, f] = gripper_sim(params, x0, repmat(u,1,100));
 
+%% Lines
+time = 0:h:h*N;
 lstyle = '-';
-plot(x(2,:), ['b' lstyle])
+plot(time, x(2,:), ['b' lstyle])
 hold on
-plot(x(4,:) - x(5,:), ['g' lstyle])
-plot(x(6,:), ['r' lstyle])
+plot(time, x(4,:) - x(5,:), ['g' lstyle])
+plot(time, x(6,:), ['r' lstyle])
 hold off
+legend('Disk Y-Position', 'Gripper Gap', 'Gripper Y-Position')
+xlabel('Time (Seconds)')
+a = gca;
+for k = 1:numel(a.Children)
+    a.Children(k).LineWidth = 2;
+end
+a.FontSize = 14;
+a.FontWeight = 'bold';
