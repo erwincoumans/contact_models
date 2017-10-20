@@ -7,12 +7,12 @@ close all
 h = 0.02;
 mu = [0.3; 0.3; 0.2];
 m = 0.1;
-r = 0.5;
+r = 0.05;
 m_g = 0.8;
 params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_g', m_g, 'step_fun', @forward_lcp);
 params_ddp = params;
-params_ddp.fd = 1e-3; % set below
-% params_ddp.step_fun = @forward_convex;
+params_ddp.fd = 1e-4; % set below
+params_ddp.step_fun = @forward_convex;
 op = struct('plot', 0, 'print', 1, 'maxIter', 500);
 
 % set up the optimization problem

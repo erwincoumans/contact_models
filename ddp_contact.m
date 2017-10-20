@@ -6,6 +6,7 @@ DYNCST  = @(x,u,i) sys_dyn_cst(params, x,u,false);
 if (exist('op','var') && isfield(op,'plot') && (op.plot > 0))
     x1 = repmat(x0,1,size(u0,2)+1);
     time = 0:params.h:params.h*(size(x1,2)-1);
+    figure('ToolBar','none','NumberTitle','off','Name','Trajectory')
     ph = plot(time,x1(2,:),'b',time,x1(4,:)-x1(5,:),'g',time,x1(6,:),'r');
     xlabel('time (sec)'); ylabel('position (m)');
     plotFn = @(x) update_plot(ph, x);
@@ -44,7 +45,7 @@ lu = 1e-5*[1 1 1]*u.^2;
 % final cost
 if any(final)
 %    llf = sabs(x(2,final) - (r+0.5), 0.1);
-   llf = 4*(x(2,final) - (r+0.3)).^2;
+   llf = 400*(x(2,final) - (r+0.03)).^2;
    lf = double(final);
    lf(final) = llf;
 else
@@ -53,9 +54,9 @@ end
 
 % running cost
 lx = 0;
-lx = lx + 0.1*sabs(x(4,:)-x(5,:), 0.1);
-lx = lx + 0.1*sabs(x(4,:)+x(5,:), 0.1);
-lx = lx + 0.2*sabs(x(2,:) - (r+0.3), 0.1);
+lx = lx + 0.05*sabs(x(4,:)-x(5,:), 0.1);
+lx = lx + 0.05*sabs(x(4,:)+x(5,:), 0.1);
+lx = lx + 2.0*sabs(x(2,:) - (r+0.03), 0.1);
 % lx = lx + 1e-3*(x(2,:) - (r+0.5)).^2;
 
 % total cost
