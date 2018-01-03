@@ -9,7 +9,7 @@ mu = [0.3; 0.3; 0.2];
 m = 0.2;
 r = 0.05;
 m_g = 2.0;
-params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_g', m_g, 'step_fun', @forward_convex);
+params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_g', m_g, 'step_fun', @forward_ccp);
 
 x0 = [0, r, 0, 1.2*r, -1.2*r, 0, zeros(1,6)]';
 u = [-4 4 5]';
