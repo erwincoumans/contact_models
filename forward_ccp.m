@@ -33,7 +33,8 @@ end
 v0 = v_prev + M\Fext*h;
 lambda = 1;
 omega = 1;
-r_max = 50;
+r_max = 500;
+tol = 1e-6;
 
 v = v0;
 for r = 1:r_max
@@ -48,11 +49,14 @@ for r = 1:r_max
         gamma2{i} = lambda*project(delta, mu(i)) + (1-lambda)*gamma2{i};
         v_next = v_next + E2{i}*gamma2{i};
     end
+    if all(abs(v - v_next) < tol)
+        break
+    end
     v = v_next;
 end
 
-f = cat(1, gamma1{:}, gamma2{:});
-v_next = v;
+f = [gamma2{:}];
+f = cat(1, gamma1{:}, f(:));
 q_next = q_prev + h*v_next;
 
 end
