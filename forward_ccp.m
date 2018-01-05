@@ -31,9 +31,9 @@ end
 % ktilde = M*v_prev + Fext*h;
 % v{1} = M\ktilde;
 v0 = v_prev + M\Fext*h;
-lambda = 1;
+lambda = 0.1;
 omega = 1;
-r_max = 500;
+r_max = 3000;
 tol = 1e-6;
 
 v = v0;
@@ -54,6 +54,9 @@ for r = 1:r_max
     end
     v = v_next;
 end
+if (r == r_max)
+    warning('Max iterations reached')
+end
 
 f = [gamma2{:}];
 f = cat(1, gamma1{:}, f(:));
@@ -72,7 +75,7 @@ elseif g_r <= -g_n/mu
     pi_g = zeros(size(gamma));
 else
     pi_n = (g_r*mu + g_n)/(mu^2 + 1);
-    pi_g = [pi_n; gamma(2:end)*pi_n/g_r];
+    pi_g = [pi_n; mu*gamma(2:end)*pi_n/g_r];
 end
 
 end

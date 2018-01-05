@@ -51,8 +51,8 @@ psi2 = [q_next(4) - q_next(5)
 f = NaN(size(J,1),1);
 
 % Active limits and contacts
-l_active = psi2(1:3) < 0.1;
-c_active = psi2(4:6) < 0.1;
+l_active = psi2(1:3) < 0.01;
+c_active = psi2(4:6) < 0.01;
 J = J([l_active; c_active; c_active],:);
 psi = psi([l_active; c_active]);
 mu = mu(c_active);
