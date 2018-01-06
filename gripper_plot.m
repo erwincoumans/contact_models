@@ -40,6 +40,7 @@ for k = 1:size(x,2)
     h_x1.YData = x(6,k)+[0 3*r];
     h_x2.XData = x(5,k)+[0 0];
     h_x2.YData = x(6,k)+[0 3*r];
+    h_ceil.XData = 0.5*(x(4,k) + x(5,k))+[-2 2 2 -2]*r;
     h_ceil.YData = x(6,k)+[3 3 4 4]*r;
     h_disk.XData = x(1,k) + xs;
     h_disk.YData = x(2,k) + ys;
