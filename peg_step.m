@@ -31,14 +31,14 @@ psi = [w - (q(1) + s*sth + r*cth)
        (q(1) + w)*cth + (q(2) - 0)*sth - r];
 
 % Jacobian for contacts
-J = [-1    0    r*sth - s*cth % normal 1
-      1    0    r*sth + s*cth % normal 2
-     -cth  sth  0 % TODO      % normal 3
-      cth  sth  0 % TODO      % normal 4
-      0   -1   -r*cth - s*sth % tangent 1
-      0    1   -r*cth + s*sth % tangent 2
-      sth -cth -r             % tangent 3
-     -sth  cth -r];           % tangent 4
+J = [-1    0    r*sth - s*cth       % normal 1
+      1    0    r*sth + s*cth       % normal 2
+     -cth  sth  (q(1) - w)*sth - q(2)*cth % normal 3
+      cth  sth -(q(1) + w)*sth + q(2)*cth % normal 4
+      0   -1   -r*cth - s*sth       % tangent 1
+      0    1   -r*cth + s*sth       % tangent 2
+      sth -cth -r                   % tangent 3
+     -sth  cth -r];                 % tangent 4
 
  % All contacts active at all times
  

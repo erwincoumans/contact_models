@@ -3,17 +3,17 @@ clear
 
 % Parameters
 h = 0.02;
-mu = 0.9*ones(4,1);
+mu = 0.3*ones(4,1);
 m = 0.2;
 r = 0.02;
-s = 0.10;
-w = 0.03;
+s = 0.02;
+w = 0.021;
 
 params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 's', s, ...
     'w', w, 'step_fun', @forward_lcp);
 
-% x0 = [-0.01, 0.04, pi/16, 0, 0, pi/4]';
-x0 = [-0.052, 0.06, 0.7, 0, 0, 0]';
+th0 = asin(w/(sqrt(2)*r)) - pi/4;
+x0 = [0, -0.02, th0, 0, 0, 0]';
 u = [0, 0, 0]';
 N = 51;
 
