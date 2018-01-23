@@ -7,11 +7,11 @@ h = params.h;
 mu = params.mu;
 m = params.m; % peg mass
 r = params.r; % peg radius
-s = params.s; % peg length (half)
+l = params.l; % peg length (half)
 w = params.w; % hole radius
 step_fun = params.step_fun;
 
-M = diag([m m m*(r^2+s^2)/3]);
+M = diag([m m m*(r^2+l^2)/3]);
 
 % Extract pose and velocity
 n = size(x,1);
@@ -25,20 +25,20 @@ cth = cos(q(3));
 Fext = [0; -9.81*m; 0] + u;
 
 % Contact normal distances (gaps)
-psi = [w - (q(1) + s*sth + r*cth)
-       (q(1) + s*sth - r*cth) + w
-       (w - q(1))*cth + (0 - q(2))*sth - r
-       (q(1) + w)*cth + (q(2) - 0)*sth - r];
+psi = [w - (q(2) + r*cth - l*sth)
+       w - (q(2) + r*cth + l*sth)
+       w + (q(2) - r*cth + l*sth)
+       w + (q(2) - r*cth - l*sth)];
 
 % Jacobian for contacts
-J = [-1    0    r*sth - s*cth       % normal 1
-      1    0    r*sth + s*cth       % normal 2
-     -cth  sth  (q(1) - w)*sth - q(2)*cth % normal 3
-      cth  sth -(q(1) + w)*sth + q(2)*cth % normal 4
-      0   -1   -r*cth - s*sth       % tangent 1
-      0    1   -r*cth + s*sth       % tangent 2
-      sth -cth -r                   % tangent 3
-     -sth  cth -r];                 % tangent 4
+J = [ 0 -1  l*cth + r*sth   % normal 1
+      0 -1 -l*cth + r*sth   % normal 2
+      0  1  l*cth - r*sth   % normal 3
+      0  1 -l*cth - r*sth   % normal 4
+     -1  0  r*cth - l*sth   % tangent 1
+     -1  0  r*cth + l*sth   % tangent 2
+      1  0  r*cth - l*sth   % tangent 3
+      1  0  r*cth + l*sth]; % tangent 4
 
  % All contacts active at all times
  
