@@ -12,8 +12,8 @@ w = 0.021;
 params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'l', l, ...
     'w', w, 'step_fun', @forward_lcp);
 
-x0 = [0, 0, 0, 0, 0, 0]';
-u = [1, 0, 0]';
+x0 = [0, r-w, 0, 0]';
+u = [1, 0]';
 N = 31;
 
 %% Simulation
@@ -40,10 +40,10 @@ end
 f3 = [f3{:}];
 
 %% Plotting
-plot(time, x1(4,:), '-')
+plot(time, x1(3,:), '-')
 hold on
-plot(time, x2(4,:), '--')
-plot(time, x3(4,:), ':')
+plot(time, x2(3,:), '--')
+plot(time, x3(3,:), ':')
 hold off
 
 legend('LCP','CCP','Convex')

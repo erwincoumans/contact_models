@@ -60,6 +60,7 @@ end
 
 f = [gamma2{:}];
 f = cat(1, gamma1{:}, f(:));
+f = [f(1:2:end); f(2:2:end)];
 q_next = q_prev + h*v_next;
 
 end
