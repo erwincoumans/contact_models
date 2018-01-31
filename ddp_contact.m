@@ -6,7 +6,8 @@ DYNCST  = @(x,u,i) sys_dyn_cst(params, x,u,false);
 if (exist('op','var') && isfield(op,'plot') && (op.plot > 0))
     x1 = repmat(x0,1,size(u0,2)+1);
     time = 0:params.h:params.h*(size(x1,2)-1);
-    figure('ToolBar','none','NumberTitle','off','Name','Trajectory')
+    figure('ToolBar','none','NumberTitle','off','Name','Trajectory',...
+        'Position',[120 678 560 420])
     ph = plot(time,x1(2,:),'b',time,x1(4,:)-x1(5,:),'g',time,x1(6,:),'r');
     xlabel('time (sec)'); ylabel('position (m)');
     plotFn = @(x) update_plot(ph, x);
