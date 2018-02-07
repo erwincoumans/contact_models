@@ -55,7 +55,7 @@ for r = 1:r_max
     v = v_next;
 end
 if (r == r_max)
-    warning('Max iterations reached')
+    disp('Max iterations reached')
 end
 
 f = [gamma2{:}];

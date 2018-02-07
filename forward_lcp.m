@@ -23,10 +23,6 @@ A = J*(M\J'); % [nl+2*nc x nl+2*nc]
 A = (A + A')/2; % should be symmetric
 c = J*(v_prev + M\Fext*h); % [nl+2*nc x 1]
 
-% Contact smoothing
-cfm = 1e-6;
-A = (A + diag([(cfm/h)*ones(nl+nc,1); zeros(2*nc,1)]));
-
 % Constraints
 Mat = [A [zeros(nl+nc,nc); E]
      zeros(nc, nl) U -E' zeros(nc)];
