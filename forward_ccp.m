@@ -28,36 +28,39 @@ for i = 1:nc
     gamma2{i} = [0 0]';
 end
 
+
 % ktilde = M*v_prev + Fext*h;
 % v{1} = M\ktilde;
 v0 = v_prev + M\Fext*h;
-lambda = 0.1;
+lambda = 1;
 omega = 1;
-r_max = 3000;
+r_max = 300;
 tol = 1e-6;
 
 v = v0;
 for r = 1:r_max
-    v_next = v0;
+    vprev = v;
+    gprev1 = gamma1;
+    gprev2 = gamma2;
     for i = 1:nl
         delta = gamma1{i} - omega*eta1{i}*(D1{i}'*v + psi(i)/h);
         gamma1{i} = lambda*max(delta, 0) + (1-lambda)*gamma1{i};
-        v_next = v_next + E1{i}*gamma1{i};
+        v = v + E1{i}*(gamma1{i} - gprev1{i});
     end
     for i = 1:nc
         delta = gamma2{i} - omega*eta2{i}*(D2{i}'*v + [psi(nl + i)/h; 0]);
         gamma2{i} = lambda*project(delta, mu(i)) + (1-lambda)*gamma2{i};
-        v_next = v_next + E2{i}*gamma2{i};
+        v = v + E2{i}*(gamma2{i} - gprev2{i});
     end
-    if all(abs(v - v_next) < tol)
+    if all(abs(v - vprev) < tol)
         break
     end
-    v = v_next;
 end
 if (r == r_max)
     disp('Max iterations reached')
 end
 
+v_next = v;
 f = [gamma2{:}];
 f = cat(1, gamma1{:}, f(:));
 f = [f(1:2:end); f(2:2:end)];
