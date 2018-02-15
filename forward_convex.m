@@ -32,11 +32,13 @@ Alt = [-A(1:nl+nc,:);... % no penetration
     zeros(nc,nl) -U -eye(nc);... % friction cone
     -eye(nl+nc) zeros(nl+nc,nc)]; % no attractive contact forces
 blt = [c(1:nl+nc,:) + psi/h; zeros(nl+3*nc,1)];
+% c(1:numel(psi)) = c(1:numel(psi)) + psi/h; % increases agreement with LCP
 
 % Solve for contact impulses
-f = quadprog(A + R, c, Alt, blt, [], [], [], [], [], ...
-    optimset('Algorithm', 'interior-point-convex', 'Display', 'off'));
-% f = primal_interior_point(A+R, c, -Alt, -blt, nl, nc);
+% f = gpgs(A, c, nl, nc, mu);
+f = primal_interior_point(A+R, c, -Alt, -blt);
+% f = quadprog(A + R, c, Alt, blt, [], [], [], [], [], ...
+%     optimset('Algorithm', 'interior-point-convex', 'Display', 'off'));
 % f = sqopt('contact', @(x) (A+R)*x, c, zeros(size(c)), [], [], Alt, [], blt);
 
 % Calculate next state from contact inpulses
