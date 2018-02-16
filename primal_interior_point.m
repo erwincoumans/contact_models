@@ -42,7 +42,11 @@ while (m*kappa > tol1)
         hess = H + A'*diag(h_vals)*A;
 
         % Newton's method
-        dx = -hess\grad;
+        if rcond(hess) < 1e-8
+            dx = -pinv(hess)*grad;
+        else
+            dx = -hess\grad;
+        end
 
         % Line search (exact)
         dc = (s0 - A(~mask,:)*x0 + b(~mask))./(A(~mask,:)*dx)-eps;

@@ -30,6 +30,7 @@ vec = [c + [psi/h; zeros(2*nc,1)]; zeros(nc,1)];
 
 % Solve for contact impulses
 z = lemke(Mat, vec);
+% z = pathlcp(Mat, vec);
 f = z(1:nl+2*nc);
 f(nl+nc+(1:nc)) = f(nl+nc+(1:nc)) - z(nl+2*nc+(1:nc));
 
