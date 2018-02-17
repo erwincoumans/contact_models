@@ -1,4 +1,4 @@
-function x0 = primal_interior_point(H, c, A, b)
+function x0 = interior_point(H, c, A, b)
 % Attempts to solve:
 %   x = argmin 0.5*x'*H*x + x'*c  subject to  A*x >= b
 
