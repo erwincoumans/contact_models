@@ -1,22 +1,20 @@
-function [y, f] = peg_step(params, x, u)
-% x = [q; v]
-% q = [x_disk, y_disk, th_disk, x1_grip, x2_grip, y_grip]
+function [st, x] = peg_step(params, st, u)
+% st = [x_pos, y_pos, theta, x_vel, y_vel, omega]
 
 % System parameters
 h = params.h;
 mu = params.mu;
 m = params.m; % peg mass
 r = params.r; % peg radius
-l = params.l; % peg length (half)
-w = params.w; % hole radius
+l = params.l; % peg half-length
+w = params.w; % slot half-width
 step_fun = params.step_fun;
 
 M = diag([m m m*(r^2+l^2)/3]);
 
 % Extract pose and velocity
-n = size(x,1);
-q = x(1:n/2);
-v = x(n/2+1:end);
+q = st(1:3);
+v = st(4:6);
 
 sth = sin(q(3));
 cth = cos(q(3));
@@ -42,7 +40,7 @@ J = [ 0 -1  l*cth + r*sth   % normal 1
 
  % All contacts active at all times
  
-[q_next, v_next, f] = step_fun(h, M, q, v, Fext, mu, psi, J);
+[q_next, v_next, x] = step_fun(q, v, Fext, M, J, mu, psi, h);
 
-y = [q_next; v_next];
+st = [q_next; v_next];
 end

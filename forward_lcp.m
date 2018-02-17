@@ -1,41 +1,48 @@
-function [q_next, v_next, f] = forward_lcp(h, M, q_prev, v_prev, Fext, mu, psi, J)
+function [q_next, v_next, x] = forward_lcp(q_prev, v_prev, Fext, M, J, mu, psi, h)
 % Input:
-% h - time step
-% M - inertia matrix [n x n]
-% q_prev - pose [n x 1]
-% v_prev - velocity [n x 1]
-% Fext - gravitational and other forces [n x 1]
-% mu - coefficients of friction [nc x 1]
-% psi - contact normal distances [nl+nc x 1]
-% J - contact Jacobian [nl+2*nc x n ] ... assume 2D
+%   q_prev - pose [n x 1]
+%   v_prev - velocity [n x 1]
+%   Fext - gravitational and other forces [n x 1]
+%   M - inertia matrix [n x n]
+%   J - contact Jacobian [2*nc x n]
+%   mu - coefficients of friction [nc x 1]
+%   psi - contact gap distances [nc x 1]
+%   h - time step
+% Output:
+%   q_next - pose [n x 1]
+%   v_prev - velocity [n x 1]
+%   x - contact impulses [nc x 1]
 
-% Matrix dimensions
-nc = size(mu,1);
-nl = size(psi,1) - nc;
+%% Setup
+nc = size(mu,1); % number of contacts
 
-% Exta tangential impulse variables (reversed sign)
-J = [J; -J(nl+nc+1:end,:)];
-E = [eye(nc); eye(nc)];
-
-% Helper variables
-U = diag(mu); % [nc x nc]
-A = J*(M\J'); % [nl+2*nc x nl+2*nc]
+% Inverse inertia matrix in the contact frame
+A = J*(M\J');
 A = (A + A')/2; % should be symmetric
-c = J*(v_prev + M\Fext*h); % [nl+2*nc x 1]
 
-% Constraints
-Mat = [A [zeros(nl+nc,nc); E]
-     zeros(nc, nl) U -E' zeros(nc)];
-vec = [c + [psi/h; zeros(2*nc,1)]; zeros(nc,1)];
+% Resulting contact velocities if all contact impulses are 0
+c = J*(v_prev + M\Fext*h);
 
-% Solve for contact impulses
-z = lemke(Mat, vec);
-% z = pathlcp(Mat, vec);
-f = z(1:nl+2*nc);
-f(nl+nc+(1:nc)) = f(nl+nc+(1:nc)) - z(nl+2*nc+(1:nc));
+% Baumgarte stabilization
+b = c + [psi/h; zeros(nc,1)];
 
-% Calculate next state from contact inpulses
-v_next = v_prev + M\(J'*z(1:nl+3*nc) + Fext*h);
+%% Linear Complementarity Problem (LCP)
+
+% Augment with exta tangent directions and friction cone
+A2 = [ A                   -A(:,nc+1:end)         [zeros(nc); eye(nc)]
+      -A(nc+1:end,:)        A(nc+1:end,nc+1:end)  eye(nc)
+       [diag(mu) -eye(nc)] -eye(nc)               zeros(nc)];
+b2 = [b; -b(nc+1:end); zeros(nc,1)];
+
+% Solve for contact impulses (Lemke)
+x2 = lemke(A2, b2);
+% x2 = pathlcp(A2, b2);
+
+% Collapse extra directions
+x = [x2(1:nc); x2(nc+1:2*nc) - x2(2*nc+1:3*nc)];
+
+%% Integrate velocity and pose
+v_next = v_prev + M\(J'*x + Fext*h);
 q_next = q_prev + h*v_next;
 
 end

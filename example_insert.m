@@ -18,26 +18,13 @@ N = 31;
 
 %% Simulation
 time = 0:h:h*(N-1);
-[x1, x2, x3] = deal(repmat(x0, 1, N));
-[f1, f2, f3] = deal(cell(1, N));
 
 params.step_fun = @forward_lcp;
-for k = 2:N
-    [x1(:,k), f1{k}] = disk_step(params, x1(:,k-1), u);
-end
-f1 = [f1{:}];
-
+[x1, f1] = stepper(params, @disk_step, x0, u, N);
 params.step_fun = @forward_ccp;
-for k = 2:N
-    [x2(:,k), f2{k}] = disk_step(params, x2(:,k-1), u);
-end
-f2 = [f2{:}];
-
+[x2, f2] = stepper(params, @disk_step, x0, u, N);
 params.step_fun = @forward_convex;
-for k = 2:N
-    [x3(:,k), f3{k}] = disk_step(params, x3(:,k-1), u);
-end
-f3 = [f3{:}];
+[x3, f3] = stepper(params, @disk_step, x0, u, N);
 
 %% Plotting
 plot(time, x1(3,:), '-')

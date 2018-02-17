@@ -1,17 +1,20 @@
-function [y, f] = particle_step(params, x, u)
-% x = [x_pos, y_pos, x_vel, y_vel]
+function [st, x] = particle_step(params, st, u)
+% st = [x_pos, y_pos, x_vel, y_vel]
 
 % System parameters
 h = params.h;
 mu = params.mu;
-m = params.m;
+m = params.m; % particle mass
 step_fun = params.step_fun;
 
 M = diag([m m]);
 
 % Extract pose and velocity
-q = x(1:2);
-v = x(3:4);
+q = st(1:2);
+v = st(3:4);
+
+% Gravitational, external, and other forces
+Fext = [0; -9.81*m] + u;
 
 % Contact normal distances (gaps)
 psi = q(2);
@@ -19,13 +22,15 @@ psi = q(2);
 % Jacobian for contacts
 J = [0  1; 1 0];
 
-v_next = (v + M\u*h);
+% Step without contact impulses
+v_next = (v + M\Fext*h);
 q_next = q + h*v_next;
-f = [0; 0];
+x = [0; 0];
 
+% Identify active contacts
 if (q_next(2) < 0.01)
-    [q_next, v_next, f] = step_fun(h, M, q, v, u, mu, psi, J);
+    [q_next, v_next, x] = step_fun(q, v, Fext, M, J, mu, psi, h);
 end
 
-y = [q_next; v_next];
+st = [q_next; v_next];
 end

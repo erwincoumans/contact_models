@@ -6,7 +6,7 @@ clear
 
 % Parameters
 h = 0.02;
-mu = [0.3; 0.3; 0.2];
+mu = [0.2; 0.2; 0.3; 0.3; 0.2];
 m = 0.2;
 r = 0.05;
 m_g = 2.0;
@@ -14,23 +14,25 @@ params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_g', m_g, 'step_fun', @forwa
 
 x0 = [0, r, 0, 1.2*r, -1.2*r, 0, zeros(1,6)]';
 u = [-4 4 5]';
-N = 50;
+N = 51;
 
 %% Simulation
-time = 0:h:h*N;
+time = 0:h:h*(N-1);
 
 params.step_fun = @forward_lcp;
-[x{1}, ~] = gripper_sim(params, x0, repmat(u,1,N));
+[x{1}, f{1}] = stepper(params, @gripper_step, x0, u, N);
+params.step_fun = @forward_pgs;
+[x{2}, f{2}] = stepper(params, @gripper_step, x0, u, N);
 params.step_fun = @forward_ccp;
-[x{2}, ~] = gripper_sim(params, x0, repmat(u,1,N));
+[x{3}, f{3}] = stepper(params, @gripper_step, x0, u, N);
 params.step_fun = @forward_convex;
-[x{3}, ~] = gripper_sim(params, x0, repmat(u,1,N));
+[x{4}, f{4}] = stepper(params, @gripper_step, x0, u, N);
 
 %% Plotting
-colors = {[0 0.447 0.741], [0.850 0.325 0.098], [0.929 0.6940 0.125]};
-styles = {'-', '--', ':'};
+colors = {[0 0.447 0.741], [0.850 0.325 0.098], [0.929 0.6940 0.125], [0.494 0.184 0.556]};
+styles = {'-', '-.', '--', ':'};
 
-for i = 1:3
+for i = 1:4
     plot(time, x{i}(2,:), styles{i}, 'Color', colors{1})
     hold on
     plot(time, x{i}(4,:) - x{i}(5,:), styles{i}, 'Color', colors{2})

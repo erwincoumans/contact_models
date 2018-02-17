@@ -1,52 +1,54 @@
-function [q_next, v_next, f] = forward_pgs(h, M, q_prev, v_prev, Fext, mu, psi, J)
+function [q_next, v_next, x] = forward_pgs(q_prev, v_prev, Fext, M, J, mu, psi, h)
 % Input:
-% h - time step
-% M - inertia matrix [n x n]
-% q_prev - pose [n x 1]
-% v_prev - velocity [n x 1]
-% Fext - gravitational and other forces [n x 1]
-% mu - coefficients of friction [nc x 1]
-% psi - contact normal distances [nl+nc x 1]
-% J - contact Jacobian [nl+2*nc x n ] ... assume 2D
+%   q_prev - pose [n x 1]
+%   v_prev - velocity [n x 1]
+%   Fext - gravitational and other forces [n x 1]
+%   M - inertia matrix [n x n]
+%   J - contact Jacobian [2*nc x n]
+%   mu - coefficients of friction [nc x 1]
+%   psi - contact gap distances [nc x 1]
+%   h - time step
+% Output:
+%   q_next - pose [n x 1]
+%   v_prev - velocity [n x 1]
+%   x - contact impulses [nc x 1]
 
-% Matrix dimensions
-nc = size(mu,1);
-nl = size(psi,1) - nc;
+%% Setup
+nc = size(mu,1); % number of contacts
 
-% Helper variables
-A = J*(M\J'); % [nl+2*nc x nl+2*nc]
+% Inverse inertia matrix in the contact frame
+A = J*(M\J');
 A = (A + A')/2; % should be symmetric
-b = J*(v_prev + M\Fext*h); % [nl+2*nc x 1]
-b = b + [psi/h; zeros(nc,1)];
 
-% Solve for contact impulses
-tol = 1e-6;
-r_max = 30;
+% Resulting contact velocities if all contact impulses are 0
+c = J*(v_prev + M\Fext*h);
 
-x = zeros(nl+2*nc,1);
-for r = 1:r_max
-    x_prev = x;
-    for i = 1:nl+2*nc
-        x(i) = x(i) - (A(i,:)*x + b(i))/A(i,i);
-        if (i > nl + nc)
-            hi = mu(i-nl-nc)*x(i - nc);
-            lo = -hi;
-            x(i) = min(max(lo, x(i)), hi);
+% Baumgarte stabilization
+b = c + [psi/h; zeros(nc,1)];
+
+%% Linear Complementarity Problem with Bounds (BLCP)
+D = diag(A);
+
+% Solve for contact impulses (Projected Gauss-Seidel)
+x = zeros(2*nc,1);
+for r = 1:30
+    for i = 1:2*nc
+        % Single element update
+        xnew = x(i) - (A(i,:)*x + b(i))/D(i);
+        % Project impulse into friction cone
+        if (i > nc)
+            % tangential direction
+            x_n = mu(i - nc)*x(i - nc);
+            x(i) = min(max(-x_n, xnew), x_n);
         else
-            x(i) = max(0, x(i));
+            % normal direction
+            x(i) = max(0, xnew);
         end
     end
-    if all(abs(x - x_prev) < tol)
-        break
-    end
 end
-if (r == r_max)
-    disp('Max iterations reached')
-end
-f = x;
 
-% Calculate next state from contact inpulses
-v_next = v_prev + M\(J'*f + Fext*h);
+%% Integrate velocity and pose
+v_next = v_prev + M\(J'*x + Fext*h);
 q_next = q_prev + h*v_next;
 
 end

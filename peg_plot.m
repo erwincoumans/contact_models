@@ -3,8 +3,8 @@ function peg_plot(params, x, f, filename)
 % Parameters
 h = params.h;
 r = params.r; % peg radius
-l = params.l; % peg length (half)
-w = params.w; % hole radius
+l = params.l; % peg half-length
+w = params.w; % slot half-width
 
 xs = [-1  1  1 -1]*l;
 ys = [ 1  1 -1 -1]*r;
@@ -39,12 +39,12 @@ for k = 1:size(x,2)
     h_disk.YData = x(2,k) + xs*sin(x(3,k)) + ys*cos(x(3,k));
     if ~isempty(h_quiv1) && (k > 1)
         h_quiv1.XData = h_disk.XData;
-        h_quiv1.UData = -f(5:8,k-1);
-        h_quiv1.VData = -f(1:4,k-1);
+        h_quiv1.UData = -f(5:8,k);
+        h_quiv1.VData = -f(1:4,k);
         h_quiv2.XData = h_disk.XData;
         h_quiv2.YData = h_disk.YData;
-        h_quiv2.UData = f(5:8,k-1);
-        h_quiv2.VData = f(1:4,k-1);
+        h_quiv2.UData = f(5:8,k);
+        h_quiv2.VData = f(1:4,k);
     end
     axis(lims)
     

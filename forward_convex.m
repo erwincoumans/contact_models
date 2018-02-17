@@ -1,48 +1,57 @@
-function [q_next, v_next, f] = forward_convex(h, M, q_prev, v_prev, Fext, mu, psi, J)
+function [q_next, v_next, x] = forward_convex(q_prev, v_prev, Fext, M, J, mu, psi, h)
 % Input:
-% h - time step
-% M - inertia matrix [n x n]
-% q_prev - pose [n x 1]
-% v_prev - velocity [n x 1]
-% Fext - gravitational and other forces [n x 1]
-% mu - coefficients of friction [nc x 1]
-% psi - contact normal distances [nl+nc x 1]
-% J - contact Jacobian [nl+2*nc x n ] ... assume 2D
+%   q_prev - pose [n x 1]
+%   v_prev - velocity [n x 1]
+%   Fext - gravitational and other forces [n x 1]
+%   M - inertia matrix [n x n]
+%   J - contact Jacobian [2*nc x n]
+%   mu - coefficients of friction [nc x 1]
+%   psi - contact gap distances [nc x 1]
+%   h - time step
+% Output:
+%   q_next - pose [n x 1]
+%   v_prev - velocity [n x 1]
+%   x - contact impulses [nc x 1]
 
-% Matrix dimensions
-nc = size(mu,1);
-nl = size(psi,1) - nc;
+%% Setup
+nc = size(mu,1); % number of contacts
 
-% Helper variables
-U = diag(mu); % [nc x nc]
-A = J*(M\J'); % [nl+2*nc x nl+2*nc]
+% Inverse inertia matrix in the contact frame
+A = J*(M\J');
 A = (A + A')/2; % should be symmetric
-c = J*(v_prev + M\Fext*h); % [nl+2*nc x 1]
+
+% Resulting contact velocities if all contact impulses are 0
+c = J*(v_prev + M\Fext*h);
+
+% Baumgarte stabilization
+b = c + [psi/h; zeros(nc,1)];
+
+%% Convex Quadratic Program
 
 % Contact smoothing
 Rmax = 100;
 Rmin = 0.01;
 wmax = 0.1;
-psi_rep = psi([1:end,nl+1:end]); % [nl+2*nc x 1]
-R = diag((Rmin + (Rmax - Rmin)*psi_rep/wmax));
+R = diag((Rmin + (Rmax - Rmin)*[psi; psi]/wmax));
 
 % Constraints
-Alt = [-A(1:nl+nc,:);... % no penetration
-    zeros(nc,nl) -U +eye(nc);... % friction cone
-    zeros(nc,nl) -U -eye(nc);... % friction cone
-    -eye(nl+nc) zeros(nl+nc,nc)]; % no attractive contact forces
-blt = [c(1:nl+nc,:) + psi/h; zeros(nl+3*nc,1)];
-% c(1:numel(psi)) = c(1:numel(psi)) + psi/h; % increases agreement with LCP
+U = diag(mu);
+Ac = [A(1:nc,:);... % no penetration
+       U       -eye(nc);... % friction cone
+       U        eye(nc);... % friction cone
+       eye(nc)  zeros(nc)]; % no attractive contact forces
+bc = [-b(1:nc); zeros(3*nc,1)];
 
-% Solve for contact impulses
-% f = gpgs(A, c, nl, nc, mu);
-f = primal_interior_point(A+R, c, -Alt, -blt);
-% f = quadprog(A + R, c, Alt, blt, [], [], [], [], [], ...
+% The substitutions A+R=>A and c=>b improve agreement with LCP
+
+% Solve for contact impulses (Interior-point)
+x = primal_interior_point(A + R, c, Ac, bc);
+% x = quadprog(A + R, c, -Ac, -bc, [], [], [], [], [], ...
 %     optimset('Algorithm', 'interior-point-convex', 'Display', 'off'));
-% f = sqopt('contact', @(x) (A+R)*x, c, zeros(size(c)), [], [], Alt, [], blt);
+% x = sqopt('contact', @(x) (A + R)*x, c, zeros(size(c)), [], [], -Ac, [], -bc);
 
-% Calculate next state from contact inpulses
-v_next = v_prev + M\(J'*f + Fext*h);
+%% Integrate velocity and pose
+v_next = v_prev + M\(J'*x + Fext*h);
 q_next = q_prev + h*v_next;
 
 end

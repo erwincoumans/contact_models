@@ -2,7 +2,7 @@ function gripper_plot(params, x, f, filename)
 
 % Parameters
 h = params.h;
-r = params.r;
+r = params.r; % disk radius
 
 % Disk
 angles = linspace(0, 2*pi, 30);
@@ -23,9 +23,9 @@ h_quiv1 = [];
 if (nargin >= 3)
     hold on
     h_quiv1 = quiver([0 0 x(4) x(5)], [x(6)+4*r x(6)+3*r x(2) x(2)],...
-        [0 0 f(4) -f(5)], [-f(2) f(3) f(7) -f(8)], 0, 'b');
+        [0 0 f(3) -f(4)], [-f(1) f(2) f(8) -f(9)], 0, 'b');
     h_quiv2 = quiver([x(1)+r x(1)-r x(1)], [x(2) x(2) 0],...
-        [-f(4) f(5) -f(9)], [-f(7) f(8) f(6)], 0, 'r');
+        [-f(3) f(4) -f(10)], [-f(8) f(9) f(5)], 0, 'r');
     hold off
 end
 axis(lims)
@@ -49,12 +49,12 @@ for k = 1:size(x,2)
     if ~isempty(h_quiv1) && (k <= size(f,2))
         h_quiv1.XData = [0 0 x(4,k) x(5,k)];
         h_quiv1.YData = [x(6,k)+4*r x(6,k)+3*r x(2,k) x(2,k)];
-        h_quiv1.UData = [0 0 f(4,k) -f(5,k)];
-        h_quiv1.VData = [-f(2,k) f(3,k) f(7,k) -f(8,k)];
+        h_quiv1.UData = [0 0 f(3,k) -f(4,k)];
+        h_quiv1.VData = [-f(1,k) f(2,k) f(8,k) -f(9,k)];
         h_quiv2.XData = [x(1,k)+r x(1,k)-r x(1,k)];
         h_quiv2.YData = [x(2,k) x(2,k) 0];
-        h_quiv2.UData = [-f(4,k) f(5,k) -f(9,k)];
-        h_quiv2.VData = [-f(7,k) f(8,k) f(6,k)];
+        h_quiv2.UData = [-f(3,k) f(4,k) -f(10,k)];
+        h_quiv2.VData = [-f(8,k) f(9,k) f(5,k)];
     end
     axis(lims)
     

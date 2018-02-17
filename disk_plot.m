@@ -3,7 +3,7 @@ function disk_plot(params, x, f, filename)
 % Parameters
 h = params.h;
 r = params.r; % disk radius
-w = params.w; % hole radius
+w = params.w; % slot half-width
 
 % Disk
 angles = linspace(0, 2*pi, 30);
@@ -42,12 +42,12 @@ for k = 1:size(x,2)
     h_line.YData(1) = x(2,k);
     if ~isempty(h_quiv1) && (k > 1)
         h_quiv1.XData = x(1,k)+[0;0];
-        h_quiv1.UData = -f(3:4,k-1);
-        h_quiv1.VData = -f(1:2,k-1);
+        h_quiv1.UData = -f(3:4,k);
+        h_quiv1.VData = -f(1:2,k);
         h_quiv2.XData = x(1,k)+[0;0];
         h_quiv2.YData = x(2,k)+[r;-r];
-        h_quiv2.UData = f(3:4,k-1);
-        h_quiv2.VData = f(1:2,k-1);
+        h_quiv2.UData = f(3:4,k);
+        h_quiv2.VData = f(1:2,k);
     end
     axis(lims)
     

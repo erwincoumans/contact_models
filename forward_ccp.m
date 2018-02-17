@@ -1,85 +1,71 @@
-function [q_next, v_next, f] = forward_ccp(h, M, q_prev, v_prev, Fext, mu, psi, J)
+function [q_next, v_next, x] = forward_ccp(q_prev, v_prev, Fext, M, J, mu, psi, h)
 % Input:
-% h - time step
-% M - inertia matrix [n x n]
-% q_prev - pose [n x 1]
-% v_prev - velocity [n x 1]
-% Fext - gravitational and other forces [n x 1]
-% mu - coefficients of friction [nc x 1]
-% psi - contact normal distances [nl+nc x 1]
-% J - contact Jacobian [nl+2*nc x n ] ... assume 2D
+%   q_prev - pose [n x 1]
+%   v_prev - velocity [n x 1]
+%   Fext - gravitational and other forces [n x 1]
+%   M - inertia matrix [n x n]
+%   J - contact Jacobian [2*nc x n]
+%   mu - coefficients of friction [nc x 1]
+%   psi - contact gap distances [nc x 1]
+%   h - time step
+% Output:
+%   q_next - pose [n x 1]
+%   v_prev - velocity [n x 1]
+%   x - contact impulses [nc x 1]
 
-% Matrix dimensions
-nc = size(mu,1);
-nl = size(psi,1) - nc;
+%% Setup
+nc = size(mu,1); % number of contacts
 
-[D1, E1, eta1, gamma1] = deal(cell(nl,1));
-for i = 1:nl
-    D1{i} = J(i,:)';
-    E1{i} = M\D1{i};
-    eta1{i} = 1/trace(D1{i}'*E1{i});
-    gamma1{i} = 0;
-end
-[D2, E2, eta2, gamma2] = deal(cell(nc,1));
+% Inverse inertia matrix in the contact frame
+A = J*(M\J');
+A = (A + A')/2; % should be symmetric
+
+% Resulting contact velocities if all contact impulses are 0
+c = J*(v_prev + M\Fext*h);
+
+% Baumgarte stabilization
+b = c + [psi/h; zeros(nc,1)];
+
+%% Cone Complementarity Problem (CCP)
+nt = [0, nc]; % normal and tangent indices
+
+D = zeros(nc,1);
 for i = 1:nc
-    D2{i} = J(nl + i + [0,nc],:)';
-    E2{i} = M\D2{i};
-    eta2{i} = 2/trace(D2{i}'*E2{i});
-    gamma2{i} = [0 0]';
+    D(i) = trace(A(i+nt, i+nt))/2;
 end
 
-
-% ktilde = M*v_prev + Fext*h;
-% v{1} = M\ktilde;
-v0 = v_prev + M\Fext*h;
-lambda = 1;
-omega = 1;
-r_max = 300;
-tol = 1e-6;
-
-v = v0;
-for r = 1:r_max
-    vprev = v;
-    gprev1 = gamma1;
-    gprev2 = gamma2;
-    for i = 1:nl
-        delta = gamma1{i} - omega*eta1{i}*(D1{i}'*v + psi(i)/h);
-        gamma1{i} = lambda*max(delta, 0) + (1-lambda)*gamma1{i};
-        v = v + E1{i}*(gamma1{i} - gprev1{i});
-    end
+% Solve for contact impulses (Projected Gauss-Seidel)
+x = zeros(2*nc,1);
+for r = 1:300
     for i = 1:nc
-        delta = gamma2{i} - omega*eta2{i}*(D2{i}'*v + [psi(nl + i)/h; 0]);
-        gamma2{i} = lambda*project(delta, mu(i)) + (1-lambda)*gamma2{i};
-        v = v + E2{i}*(gamma2{i} - gprev2{i});
+        % Block update
+        xnew = x(i+nt) - (A(i+nt,:)*x + b(i+nt))/D(i);
+        % Project impulse into friction cone
+        x(i+nt) = project(xnew, mu(i));
     end
-    if all(abs(v - vprev) < tol)
-        break
-    end
-end
-if (r == r_max)
-    disp('Max iterations reached')
 end
 
-v_next = v;
-f = [gamma2{:}];
-f = cat(1, gamma1{:}, f(:));
-f = [f(1:2:end); f(2:2:end)];
+%% Integrate velocity and pose
+v_next = v_prev + M\(J'*x + Fext*h);
 q_next = q_prev + h*v_next;
 
 end
 
-function pi_g = project(gamma, mu)
+function xproj = project(x, mu)
+% Project impulse into friction cone
 
-g_n = gamma(1);
-g_r = norm(gamma(2:end));
+x_n = x(1); % normal
+x_r = norm(x(2:end)); % combined radial
 
-if g_r <= mu*g_n
-    pi_g = gamma;
-elseif g_r <= -g_n/mu
-    pi_g = zeros(size(gamma));
+if x_r <= mu*x_n
+    % x is already in the cone
+    xproj = x;
+elseif x_r <= -x_n/mu
+    % x is in the polar cone
+    xproj = zeros(size(x));
 else
-    pi_n = (g_r*mu + g_n)/(mu^2 + 1);
-    pi_g = [pi_n; mu*gamma(2:end)*pi_n/g_r];
+    pi_n = (x_r*mu + x_n)/(mu^2 + 1);
+    xproj = [pi_n; mu*x(2:end)*pi_n/x_r];
 end
 
 end

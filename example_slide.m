@@ -16,19 +16,19 @@ time = 0:h:h*(N-1);
 
 params.step_fun = @forward_lcp;
 for k = 2:N
-    u = [mu*9.81*m + 5*(0.02 - x1(3,k-1)); -9.81*m];
+    u = [mu*9.81*m + 5*(0.02 - x1(3,k-1)); 0];
     [x1(:,k), ~] = particle_step(params, x1(:,k-1), u);
 end
 
 params.step_fun = @forward_ccp;
 for k = 2:N
-    u = [mu*9.81*m + 5*(0.02 - x2(3,k-1)); -9.81*m];
+    u = [mu*9.81*m + 5*(0.02 - x2(3,k-1)); 0];
     [x2(:,k), ~] = particle_step(params, x2(:,k-1), u);
 end
 
 params.step_fun = @forward_convex;
 for k = 2:N
-    u = [mu*9.81*m + 5*(0.02 - x3(3,k-1)); -9.81*m];
+    u = [mu*9.81*m + 5*(0.02 - x3(3,k-1)); 0];
     [x3(:,k), ~] = particle_step(params, x3(:,k-1), u);
 end
 
