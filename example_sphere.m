@@ -5,7 +5,8 @@ clear
 h = 0.02;
 mu = 0.2;
 m = 0.2;
-params = struct('h', h, 'mu', mu, 'm', m, 'step_fun', []);
+r = 0.05;
+params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'step_fun', []);
 
 x0 = [0, 0, 0.025, 1, 0, 0, 0, zeros(1, 6)]';
 u = zeros(6, 1);

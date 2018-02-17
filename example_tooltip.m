@@ -16,19 +16,19 @@ time = 0:h:h*(N-1);
 
 params.step_fun = @solver_lcp;
 for k = 2:N
-    u = [mu*9.81*m + 5*(0.02 - x1(3,k-1)); 0; 0];
+    u = [mu*9.81*m + 5*(0.02 - x1(4,k-1)); 0; 0];
     [x1(:,k), ~] = step_tooltip(params, x1(:,k-1), u);
 end
 
 params.step_fun = @solver_ccp;
 for k = 2:N
-    u = [mu*9.81*m + 5*(0.02 - x2(3,k-1)); 0; 0];
+    u = [mu*9.81*m + 5*(0.02 - x2(4,k-1)); 0; 0];
     [x2(:,k), ~] = step_tooltip(params, x2(:,k-1), u);
 end
 
 params.step_fun = @solver_convex;
 for k = 2:N
-    u = [mu*9.81*m + 5*(0.02 - x3(3,k-1)); 0; 0];
+    u = [mu*9.81*m + 5*(0.02 - x3(4,k-1)); 0; 0];
     [x3(:,k), ~] = step_tooltip(params, x3(:,k-1), u);
 end
 

@@ -18,12 +18,12 @@ q = st(1:7);
 v = st(8:13);
 
 % Gravitational, external, and other forces
-w = v(4:6);
+omega = v(4:6);
 I = M(4:6,4:6);
-Fext = [0; 0; -9.81*m; -cross(w, I*w)] + u;
+Fext = [0; 0; -9.81*m; -cross(omega, I*omega)] + u;
 
 % Positions of box corners
-R = quat2rotm(q(4:7));
+R = quat2rotm(q(4:7)');
 rs = R*[ lx -lx -lx  lx  lx -lx -lx  lx
          ly  ly -ly -ly  ly  ly -ly -ly
         -lz -lz -lz -lz  lz  lz  lz  lz];

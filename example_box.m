@@ -12,7 +12,7 @@ w = 0.021;
 
 params = struct('h', h, 'mu', mu, 'm', m, 'lx', lx, 'ly', ly, 'lz', lz, 'w', w, 'step_fun', []);
 
-x0 = [0, 0, r-w, 1, 0, 0, 0, zeros(1, 6)';
+x0 = [0, 0, lz-w, 1, 0, 0, 0, zeros(1, 6)]';
 u = [2, 0, 0, 0, 0, 0]';
 N = 101;
 

@@ -28,7 +28,7 @@ b = c + [psi/h; zeros(2*nc,1)];
 D = diag(A);
 
 % Solve for contact impulses (Projected Gauss-Seidel)
-x = zeros(2*nc,1);
+x = zeros(3*nc,1);
 for r = 1:30
     for i = 1:2*nc
         % Single element update

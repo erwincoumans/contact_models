@@ -12,8 +12,8 @@ r = 0.05;
 m_g = 2.0;
 params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_g', m_g, 'step_fun', []);
 
-x0 = [0, 0, r, 1, 0, 0, 0, 1.2*r, -1.2*r, 0, zeros(1,9)]';
-u = [-4 4 5]';
+x0 = [0, 0, r, 1, 0, 0, 0, 1.2*r, -1.2*r, 0, 0, 0, zeros(1,11)]';
+u = [-4 4 0 0 5]';
 N = 51;
 
 %% Simulation
@@ -33,14 +33,14 @@ colors = {[0 0.447 0.741], [0.850 0.325 0.098], [0.929 0.6940 0.125], [0.494 0.1
 styles = {'-', '-.', '--', ':'};
 
 for i = 1:4
-    plot(time, x{i}(2,:), styles{i}, 'Color', colors{1})
+    plot(time, x{i}(3,:), styles{i}, 'Color', colors{1})
     hold on
-    plot(time, x{i}(4,:) - x{i}(5,:), styles{i}, 'Color', colors{2})
-    plot(time, x{i}(6,:), styles{i}, 'Color', colors{3})
+    plot(time, x{i}(8,:) - x{i}(9,:), styles{i}, 'Color', colors{2})
+    plot(time, x{i}(12,:), styles{i}, 'Color', colors{3})
 end
 hold off
 
-legend('Disk Y-Position', 'Gripper Gap', 'Gripper Y-Position')
+legend('Sphere Height', 'Gripper Gap', 'Gripper Height')
 xlabel('Time (sec)')
 ylabel('Position (m)')
 a = gca;

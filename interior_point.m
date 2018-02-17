@@ -55,16 +55,16 @@ while (3*nc*kappa > tol1)
         dc = dc(dc >= 0);
         t = min([dc;1]);
         % For impulses in the friction cone
-        for i = find(~mask(nc+1:2*nc) & ~mask(2*nc+1:3*nc))
-            p = x(i+[0,nc,2*nc]);
+        for i = find(~mask(nc+1:2*nc) & ~mask(2*nc+1:3*nc))'
+            p = x0(i+[0,nc,2*nc]);
             dp = dx(i+[0,nc,2*nc]);
             % If search direction eventually leavs the friction cone
             if (norm(dp(2:3)) > mu(i)*dp(1))
                 % Find intersection
-                q = [mu(i)^2; -1; -1];
-                c0 = dot(q.*dp, dp);
-                c1 = 2*dot(q.*dp, p);
-                c2 = dot(q.*p, p) - s0;
+                mu11 = [mu(i)^2; -1; -1];
+                c0 = dot(mu11.*dp, dp);
+                c1 = 2*dot(mu11.*dp, p);
+                c2 = dot(mu11.*p, p) - s0;
                 % Take "+" root
                 t = min(t, (-c1 + sqrt(c1^2 - 4*c0*c2))/(2*c0));
             end

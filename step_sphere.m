@@ -15,15 +15,19 @@ q = st(1:7);
 v = st(8:13);
 
 % Gravitational, external, and other forces
-w = v(4:6);
+omega = v(4:6);
 I = M(4:6,4:6);
-Fext = [0; 0; -9.81*m; -cross(w, I*w)] + u;
+Fext = [0; 0; -9.81*m; -cross(omega, I*omega)] + u;
 
 % Contact normal distances (gaps)
 psi = q(3);
 
 % Jacobian for contacts
-J = [ 0  1  0; 0  0  1; 1  0  0; R'*[0 0 r; 0 -r 0; 0 0 0]]';
+J = [ 0  0  1  0  0  0
+      1  0  0  0  r  0
+      0  1  0 -r  0  0];
+R = quat2rotm(q(4:7)');
+J(:,4:6) = J(:,4:6)*R';
 
 % Step without contact impulses
 v_next = (v + M\Fext*h);
