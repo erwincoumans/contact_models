@@ -1,4 +1,4 @@
-function [q_next, v_next, x] = solver_ccp(q_prev, v_prev, Fext, M, J, mu, psi, h)
+function [v_next, x] = solver_ccp(v_prev, Fext, M, J, mu, psi, h)
 % Input:
 %   q_prev - pose [n x 1]
 %   v_prev - velocity [n x 1]
@@ -9,7 +9,6 @@ function [q_next, v_next, x] = solver_ccp(q_prev, v_prev, Fext, M, J, mu, psi, h
 %   psi - contact gap distances [nc x 1]
 %   h - time step
 % Output:
-%   q_next - pose [n x 1]
 %   v_prev - velocity [n x 1]
 %   x - contact impulses [nc x 1]
 
@@ -47,7 +46,6 @@ end
 
 %% Integrate velocity and pose
 v_next = v_prev + M\(J'*x + Fext*h);
-q_next = q_prev + h*v_next;
 
 end
 

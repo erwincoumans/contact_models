@@ -1,6 +1,5 @@
-function [q_next, v_next, x] = solver_lcp(q_prev, v_prev, Fext, M, J, mu, psi, h)
+function [v_next, x] = solver_lcp(v_prev, Fext, M, J, mu, psi, h)
 % Input:
-%   q_prev - pose [n x 1]
 %   v_prev - velocity [n x 1]
 %   Fext - gravitational and other forces [n x 1]
 %   M - inertia matrix [n x n]
@@ -9,7 +8,6 @@ function [q_next, v_next, x] = solver_lcp(q_prev, v_prev, Fext, M, J, mu, psi, h
 %   psi - contact gap distances [nc x 1]
 %   h - time step
 % Output:
-%   q_next - pose [n x 1]
 %   v_prev - velocity [n x 1]
 %   x - contact impulses [nc x 1]
 
@@ -44,6 +42,5 @@ x = [x2(1:nc); x2(nc+1:3*nc) - x2(3*nc+1:5*nc)];
 
 %% Integrate velocity and pose
 v_next = v_prev + M\(J'*x + Fext*h);
-q_next = q_prev + h*v_next;
 
 end

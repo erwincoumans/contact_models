@@ -1,4 +1,4 @@
-% Grasp using constant control inputs.
+% Sphere with fixed orientation between two planes.
 clear
 
 % Parameters
@@ -11,8 +11,8 @@ w = 0.021;
 
 params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'l', l, 'w', w, 'step_fun', []);
 
-x0 = [0, r-w, 0, 0]';
-u = [1, 0]';
+x0 = [0, 0, r-w, 0, 0, 0]';
+u = [1, 0, 0]';
 N = 31;
 
 %% Simulation
@@ -26,15 +26,15 @@ params.step_fun = @solver_convex;
 [x3, f3] = stepper(params, @step_bead, x0, u, N);
 
 %% Plotting
-plot(time, x1(3,:), '-')
+plot(time, x1(4,:), '-')
 hold on
-plot(time, x2(3,:), '--')
-plot(time, x3(3,:), ':')
+plot(time, x2(4,:), '--')
+plot(time, x3(4,:), ':')
 hold off
 
 legend('LCP','CCP','Convex')
 xlabel('Time (sec)')
-ylabel('Disk X-Velocity (m/s)')
+ylabel('Disk Velocity (m/s)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;
