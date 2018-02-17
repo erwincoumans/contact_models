@@ -24,14 +24,14 @@ A = (A + A')/2; % should be symmetric
 c = J*(v_prev + M\Fext*h);
 
 % Baumgarte stabilization
-b = c + [psi/h; zeros(nc,1)];
+b = c + [psi/h; zeros(2*nc,1)];
 
 %% Cone Complementarity Problem (CCP)
-nt = [0, nc]; % normal and tangent indices
+nt = [0, nc, 2*nc]; % normal and tangent indices
 
 D = zeros(nc,1);
 for i = 1:nc
-    D(i) = trace(A(i+nt, i+nt))/2;
+    D(i) = trace(A(i+nt, i+nt))/3;
 end
 
 % Solve for contact impulses (Projected Gauss-Seidel)

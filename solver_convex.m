@@ -24,7 +24,7 @@ A = (A + A')/2; % should be symmetric
 c = J*(v_prev + M\Fext*h);
 
 % Baumgarte stabilization
-b = c + [psi/h; zeros(nc,1)];
+b = c + [psi/h; zeros(2*nc,1)];
 
 %% Convex Quadratic Program
 
@@ -32,20 +32,18 @@ b = c + [psi/h; zeros(nc,1)];
 Rmax = 100;
 Rmin = 0.01;
 wmax = 0.1;
-R = diag((Rmin + (Rmax - Rmin)*[psi; psi]/wmax));
+R = diag((Rmin + (Rmax - Rmin)*[psi; psi; psi]/wmax));
 
 % Constraints
 U = diag(mu);
 Ac = [A(1:nc,:);... % no penetration
-       U       -eye(nc);... % friction cone
-       U        eye(nc);... % friction cone
-       eye(nc)  zeros(nc)]; % no attractive contact forces
-bc = [-b(1:nc); zeros(3*nc,1)];
+      eye(nc)  zeros(nc,2*nc)]; % no attractive contact forces
+bc = [-b(1:nc); zeros(nc,1)];
 
 % The substitutions A+R=>A and c=>b improve agreement with LCP
 
 % Solve for contact impulses (Interior-point)
-x = interior_point(A + R, c, Ac, bc);
+x = interior_point(A + R, c, Ac, bc, mu);
 % x = quadprog(A + R, c, -Ac, -bc, [], [], [], [], [], ...
 %     optimset('Algorithm', 'interior-point-convex', 'Display', 'off'));
 % x = sqopt('contact', @(x) (A + R)*x, c, zeros(size(c)), [], [], -Ac, [], -bc);

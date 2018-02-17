@@ -24,7 +24,7 @@ A = (A + A')/2; % should be symmetric
 c = J*(v_prev + M\Fext*h);
 
 % Baumgarte stabilization
-b = c + [psi/h; zeros(nc,1)];
+b = c + [psi/h; zeros(2*nc,1)];
 
 %% Linear Complementarity Problem with Bounds (BLCP)
 D = diag(A);
@@ -36,8 +36,12 @@ for r = 1:30
         % Single element update
         xnew = x(i) - (A(i,:)*x + b(i))/D(i);
         % Project impulse into friction cone
-        if (i > nc)
-            % tangential direction
+        if (i > 2*nc)
+            % tangential direction 2
+            x_n = mu(i - 2*nc)*x(i - 2*nc);
+            x(i) = min(max(-x_n, xnew), x_n);
+        elseif (i > nc)
+            % tangential direction 1
             x_n = mu(i - nc)*x(i - nc);
             x(i) = min(max(-x_n, xnew), x_n);
         else
