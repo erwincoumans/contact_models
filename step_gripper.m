@@ -1,4 +1,4 @@
-function [st, x] = gripper_step(params, st, u)
+function [st, x] = step_gripper(params, st, u)
 % st = [x_disk, y_disk, th_disk, x1_grip, x2_grip, y_grip, ...]
 
 % System parameters

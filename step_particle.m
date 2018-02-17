@@ -1,4 +1,4 @@
-function [st, x] = particle_step(params, st, u)
+function [st, x] = step_particle(params, st, u)
 % st = [x_pos, y_pos, x_vel, y_vel]
 
 % System parameters

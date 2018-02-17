@@ -1,4 +1,4 @@
-function disk_plot(params, x, f, filename)
+function plot_bead(params, x, f, filename)
 
 % Parameters
 h = params.h;

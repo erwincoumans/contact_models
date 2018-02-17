@@ -1,4 +1,4 @@
-function peg_plot(params, x, f, filename)
+function plot_peg(params, x, f, filename)
 
 % Parameters
 h = params.h;

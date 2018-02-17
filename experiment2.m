@@ -5,14 +5,14 @@ close all
 
 % Parameters
 h = 0.02;
-mu = [0.3; 0.3; 0.2];
+mu = [0.2; 0.2; 0.3; 0.3; 0.2];
 m = 0.1;
 r = 0.05;
 m_g = 0.8;
-params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_g', m_g, 'step_fun', @forward_lcp);
+params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_g', m_g, 'step_fun', @solver_lcp);
 params_ddp = params;
 params_ddp.fd = 1e-4; % set below
-params_ddp.step_fun = @forward_convex;
+params_ddp.step_fun = @solver_convex;
 op = struct('plot', 0, 'print', 1, 'maxIter', 500);
 
 % set up the optimization problem
@@ -28,7 +28,7 @@ x = cell(size(fd));
 [cst,iter] = deal(NaN(size(fd)));
 for k = 1:N
     params_ddp.fd = fd(k);
-    [x{k}, ~, cst(k), iter(k)] = ddp_contact(params_ddp, op, x0, u0);
+    [x{k}, ~, cst(k), iter(k)] = ddp_grasp(params_ddp, op, x0, u0);
 end
 
 %% Planned trajectories

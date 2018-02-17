@@ -1,4 +1,4 @@
-function [q_next, v_next, x] = forward_convex(q_prev, v_prev, Fext, M, J, mu, psi, h)
+function [q_next, v_next, x] = solver_convex(q_prev, v_prev, Fext, M, J, mu, psi, h)
 % Input:
 %   q_prev - pose [n x 1]
 %   v_prev - velocity [n x 1]
@@ -45,7 +45,7 @@ bc = [-b(1:nc); zeros(3*nc,1)];
 % The substitutions A+R=>A and c=>b improve agreement with LCP
 
 % Solve for contact impulses (Interior-point)
-x = primal_interior_point(A + R, c, Ac, bc);
+x = interior_point(A + R, c, Ac, bc);
 % x = quadprog(A + R, c, -Ac, -bc, [], [], [], [], [], ...
 %     optimset('Algorithm', 'interior-point-convex', 'Display', 'off'));
 % x = sqopt('contact', @(x) (A + R)*x, c, zeros(size(c)), [], [], -Ac, [], -bc);

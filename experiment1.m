@@ -5,14 +5,14 @@ close all
 
 % Parameters
 h = 0.02;
-mu = [0.3; 0.3; 0.2];
+mu = [0.2; 0.2; 0.3; 0.3; 0.2];
 m = 0.1;
 r = 0.05;
 m_g = 0.8;
-params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_g', m_g, 'step_fun', @forward_lcp);
+params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'm_g', m_g, 'step_fun', @solver_lcp);
 params_ddp = params;
 params_ddp.fd = 1e-4;
-params_ddp.step_fun = @forward_convex;
+params_ddp.step_fun = @solver_lcp;
 op = struct('plot', 0, 'print', 1, 'maxIter', 15);
 
 % set up the optimization problem
@@ -30,8 +30,8 @@ x(:,1) = x0;
 [x_plan, u_plan] = deal(cell(1, N-1));
 for k = 1:N-1
     fprintf('Step %d\n', k)
-    [x_plan{k}, u_plan{k}] = ddp_contact(params_ddp, op, x(:,k), u0);
-    x(:,k+1) = gripper_step(params, x(:,k), u_plan{k}(:,1));
+    [x_plan{k}, u_plan{k}] = ddp_grasp(params_ddp, op, x(:,k), u0);
+    x(:,k+1) = step_gripper(params, x(:,k), u_plan{k}(:,1));
     u0(:,1:end-1) = u_plan{k}(:,2:end); % warm start
 end
 
@@ -56,7 +56,7 @@ a.FontWeight = 'bold';
 
 %% Animation
 figure
-gripper_plot(params, x);
+plot_gripper(params, x);
 
 %% Simulate with different step size
 % rep = 4;
@@ -69,5 +69,5 @@ gripper_plot(params, x);
 % uu = spline(t1,u,t2);
 % 
 % params.h = params.h/rep;
-% [x_run, f] = gripper_sim(params, x(:,1), uu);
-% gripper_plot(params, x_run, f)
+% [x_run, f] = gripper_sim(params, @step_gripper, x(:,1), uu, N);
+% plot_gripper(params, x_run, f)

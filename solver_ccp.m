@@ -1,4 +1,4 @@
-function [q_next, v_next, x] = forward_pgs(q_prev, v_prev, Fext, M, J, mu, psi, h)
+function [q_next, v_next, x] = solver_ccp(q_prev, v_prev, Fext, M, J, mu, psi, h)
 % Input:
 %   q_prev - pose [n x 1]
 %   v_prev - velocity [n x 1]
@@ -26,29 +26,46 @@ c = J*(v_prev + M\Fext*h);
 % Baumgarte stabilization
 b = c + [psi/h; zeros(nc,1)];
 
-%% Linear Complementarity Problem with Bounds (BLCP)
-D = diag(A);
+%% Cone Complementarity Problem (CCP)
+nt = [0, nc]; % normal and tangent indices
+
+D = zeros(nc,1);
+for i = 1:nc
+    D(i) = trace(A(i+nt, i+nt))/2;
+end
 
 % Solve for contact impulses (Projected Gauss-Seidel)
 x = zeros(2*nc,1);
-for r = 1:30
-    for i = 1:2*nc
-        % Single element update
-        xnew = x(i) - (A(i,:)*x + b(i))/D(i);
+for r = 1:300
+    for i = 1:nc
+        % Block update
+        xnew = x(i+nt) - (A(i+nt,:)*x + b(i+nt))/D(i);
         % Project impulse into friction cone
-        if (i > nc)
-            % tangential direction
-            x_n = mu(i - nc)*x(i - nc);
-            x(i) = min(max(-x_n, xnew), x_n);
-        else
-            % normal direction
-            x(i) = max(0, xnew);
-        end
+        x(i+nt) = project(xnew, mu(i));
     end
 end
 
 %% Integrate velocity and pose
 v_next = v_prev + M\(J'*x + Fext*h);
 q_next = q_prev + h*v_next;
+
+end
+
+function xproj = project(x, mu)
+% Project impulse into friction cone
+
+x_n = x(1); % normal
+x_r = norm(x(2:end)); % combined radial
+
+if x_r <= mu*x_n
+    % x is already in the cone
+    xproj = x;
+elseif x_r <= -x_n/mu
+    % x is in the polar cone
+    xproj = zeros(size(x));
+else
+    pi_n = (x_r*mu + x_n)/(mu^2 + 1);
+    xproj = [pi_n; mu*x(2:end)*pi_n/x_r];
+end
 
 end

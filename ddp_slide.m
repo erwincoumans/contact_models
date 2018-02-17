@@ -28,7 +28,7 @@ function y = dyn_fun(params, x,u)
 
 y = NaN(size(x));
 for k = find(~isnan(u(1,:)))
-    y(:,k) = gripper_step(params, x(:,k), u(:,k));
+    y(:,k) = step_gripper(params, x(:,k), u(:,k));
 end
 end
 

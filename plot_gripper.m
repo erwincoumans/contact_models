@@ -1,4 +1,4 @@
-function gripper_plot(params, x, f, filename)
+function plot_gripper(params, x, f, filename)
 
 % Parameters
 h = params.h;

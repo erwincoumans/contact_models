@@ -1,4 +1,4 @@
-function [st, x] = peg_step(params, st, u)
+function [st, x] = step_peg(params, st, u)
 % st = [x_pos, y_pos, theta, x_vel, y_vel, omega]
 
 % System parameters

@@ -9,8 +9,7 @@ r = 0.02;
 l = 0.05;
 w = 0.021;
 
-params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'l', l, ...
-    'w', w, 'step_fun', @forward_lcp);
+params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'l', l, 'w', w, 'step_fun', []);
 
 x0 = [0, r-w, 0, 0]';
 u = [1, 0]';
@@ -19,12 +18,12 @@ N = 31;
 %% Simulation
 time = 0:h:h*(N-1);
 
-params.step_fun = @forward_lcp;
-[x1, f1] = stepper(params, @disk_step, x0, u, N);
-params.step_fun = @forward_ccp;
-[x2, f2] = stepper(params, @disk_step, x0, u, N);
-params.step_fun = @forward_convex;
-[x3, f3] = stepper(params, @disk_step, x0, u, N);
+params.step_fun = @solver_lcp;
+[x1, f1] = stepper(params, @step_bead, x0, u, N);
+params.step_fun = @solver_ccp;
+[x2, f2] = stepper(params, @step_bead, x0, u, N);
+params.step_fun = @solver_convex;
+[x3, f3] = stepper(params, @step_bead, x0, u, N);
 
 %% Plotting
 plot(time, x1(3,:), '-')

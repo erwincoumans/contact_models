@@ -1,4 +1,4 @@
-function [x,u,cst,iter] = ddp_contact(params, op, x0, u0)
+function [x,u,cst,iter] = ddp_grasp(params, op, x0, u0)
 
 DYNCST  = @(x,u,i) sys_dyn_cst(params, x,u,false);
 
@@ -29,7 +29,7 @@ function y = dyn_fun(params, x,u)
 
 y = NaN(size(x));
 for k = find(~isnan(u(1,:)))
-    y(:,k) = gripper_step(params, x(:,k), u(:,k));
+    y(:,k) = step_gripper(params, x(:,k), u(:,k));
 end
 end
 
