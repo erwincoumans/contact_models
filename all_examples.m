@@ -7,7 +7,7 @@ example_slide
 subplot(2,3,3)
 example_grasp
 subplot(2,3,4)
-example_insert
+example_bead
 subplot(2,3,5)
 example_peg
 f = gcf;
