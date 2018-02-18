@@ -30,7 +30,7 @@ D = diag(A);
 % Solve for contact impulses (Projected Gauss-Seidel)
 x = zeros(3*nc,1);
 for r = 1:30
-    for i = 1:2*nc
+    for i = 1:3*nc
         % Single element update
         xnew = x(i) - (A(i,:)*x + b(i))/D(i);
         % Project impulse into friction cone
