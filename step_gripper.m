@@ -44,7 +44,7 @@ J = [ zeros(1,8)              0  0 -1   % gripper lift height   (normal)
      -1  0  0  0  r  0  0  0  0  0  0   % finger2-disk           (other)
      -1  0  0  0  0  r  0  0  0  0  0]; % disk-floor             (other)
 R = quat2rotm(q(4:7)');
-J(:,4:6) = J(:,4:6)*R';
+J(:,4:6) = J(:,4:6)*R;
 
 % Step without contact impulses
 v_next = (v + M\Fext*h);
