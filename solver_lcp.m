@@ -26,6 +26,9 @@ b = c + [psi/h; zeros(2*nc,1)];
 
 %% Linear Complementarity Problem (LCP)
 
+% % CFM
+% A = A + (1e-5/h)*eye(size(A));
+
 % Augment with exta tangent directions and friction cone
 E = [eye(nc); eye(nc)];
 A2 = [ A             -A(:,nc+1:end)         [zeros(nc); E]

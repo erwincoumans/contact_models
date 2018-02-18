@@ -34,7 +34,7 @@ hold off
 
 legend('LCP','CCP','Convex')
 xlabel('Time (sec)')
-ylabel('Disk Velocity (m/s)')
+ylabel('Sphere Velocity (m/s)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;

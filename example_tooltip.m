@@ -41,7 +41,7 @@ hold off
 
 legend('LCP','CCP','Convex')
 xlabel('Time (sec)')
-ylabel('Tool Tip Height (m)')
+ylabel('Tool Height (m)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;

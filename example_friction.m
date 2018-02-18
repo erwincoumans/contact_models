@@ -32,8 +32,8 @@ plot(x4(1,:), x4(2,:), ':')
 hold off
 
 legend('LCP','BLCP','CCP','Convex')
-xlabel('X-Position')
-ylabel('Y-Position')
+xlabel('Tool X-Position (m)')
+ylabel('Tool Y-Position (m)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;

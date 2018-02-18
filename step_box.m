@@ -30,7 +30,7 @@ rs = R*[ lx -lx -lx  lx  lx -lx -lx  lx
 ps = repmat(q(1:3), 1, 8) + rs;
 
 % Contact gap distances
-psi =  [ps(3,1:4) - w, w - ps(3,5:8)]';
+psi =  [ps(3,1:4) + w, w - ps(3,5:8)]';
 
 % Jacobian for contacts
 J = [ 0  0  0  0  0  0  0  0  1  1  1  1 -1 -1 -1 -1  0  0  0  0  0  0  0  0
