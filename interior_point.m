@@ -18,7 +18,6 @@ q = 10;
 % Initial guess for impulses
 x0 = zeros(size(c));
 iter = 0;
-
 while (3*nc*kappa > tol1)
     % Modified constraints (finite everywhere)
     s0 = kappa/q;
@@ -51,9 +50,9 @@ while (3*nc*kappa > tol1)
         end
 
         % Line search (exact)
-        dc = (s0 - A(~mask(1:2*nc),:)*x0 + b(~mask(1:2*nc)))./(A(~mask(1:2*nc),:)*dx) - eps;
+        dc = (s0 - A(~mask(1:2*nc),:)*x0 + b(~mask(1:2*nc)))./(A(~mask(1:2*nc),:)*dx);
         dc = dc(dc >= 0);
-        t = min([dc;1]);
+        t = min([(1 - eps)*dc;1]);
         % For impulses in the friction cone
         for i = find(~mask(nc+1:2*nc) & ~mask(2*nc+1:3*nc))'
             p = x0(i+[0,nc,2*nc]);
@@ -65,8 +64,11 @@ while (3*nc*kappa > tol1)
                 c0 = dot(mu11.*dp, dp);
                 c1 = 2*dot(mu11.*dp, p);
                 c2 = dot(mu11.*p, p) - s0;
-                % Take "+" root
-                t = min(t, (-c1 + sqrt(c1^2 - 4*c0*c2))/(2*c0));
+                % Take "-" root
+                t11 = (-c1 - sqrt(c1^2 - 4*c0*c2))/(2*c0);
+                if t11 >= 0
+                    t = min(t, t11);
+                end
             end
         end
 
