@@ -12,10 +12,11 @@ time = 0:h:h*(N-1);
 
 ctol = 0.1;
 
-nx = 3;
-nz = 4;
+nx = 1;
+nz = 12;
 n = nx*nx*nz;
 
+rng('default')
 [x0, y0, z0] = meshgrid(3*(1:nx)-1.5, 3*(1:nx)-1.5, 3*(1:nz)-1.5);
 q0 = zeros(7*n, 1);
 q0(1:7:7*n) = r*x0(:) + r*(rand(n,1) - 0.5);
@@ -30,6 +31,7 @@ I = m*(2/5)*r^2;
 q = q0;
 qs = cell(1,N);
 qs{1} = q;
+ttot = 0;
 for k = 2:N
 	J = cell(1, n*(n-1)/2 + 3*n);
 	psi = cell(1, n*(n-1)/2 + 3*n);
@@ -121,14 +123,16 @@ for k = 2:N
         Fext(6*(i-1)+(4:6)) = -cross(omega, I*omega);
     end
 
-    try
+    tic
 	[v, imp] = solver_blcp(v, Fext, M, J, repmat(mu, nc-1, 1), psi, h);
-    catch
-        db = 1;
-    end
+    tsolve = toc;
+    ttot = ttot + tsolve;
+
     for i = 1:n
         q(7*(i-1)+(1:7)) = int_body(q(7*(i-1)+(1:7)), v(6*(i-1)+(1:6)), h);
     end
     qs{k} = q;
 end
 qs = [qs{:}];
+
+fprintf('%g\t%g\n', ttot, min(psi))
