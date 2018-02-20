@@ -1,16 +1,15 @@
 function [v_next, x] = solver_ccp(v_prev, Fext, M, J, mu, psi, h)
 % Input:
-%   q_prev - pose [n x 1]
 %   v_prev - velocity [n x 1]
 %   Fext - gravitational and other forces [n x 1]
 %   M - inertia matrix [n x n]
-%   J - contact Jacobian [2*nc x n]
+%   J - contact Jacobian [3*nc x n]
 %   mu - coefficients of friction [nc x 1]
 %   psi - contact gap distances [nc x 1]
 %   h - time step
 % Output:
 %   v_prev - velocity [n x 1]
-%   x - contact impulses [nc x 1]
+%   x - contact impulses [3*nc x 1]
 
 %% Setup
 nc = size(mu,1); % number of contacts
