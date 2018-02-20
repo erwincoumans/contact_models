@@ -30,22 +30,19 @@ D = diag(A);
 % Solve for contact impulses (Projected Gauss-Seidel)
 x = zeros(3*nc,1);
 for r = 1:30
-    for i = 1:3*nc
-        % Single element update
+    for i = 1:nc
+        % Normal
         xnew = x(i) - (A(i,:)*x + b(i))/D(i);
-        % Project impulse into friction cone
-        if (i > 2*nc)
-            % tangential direction 2
-            x_n = mu(i - 2*nc)*x(i - 2*nc);
-            x(i) = min(max(-x_n, xnew), x_n);
-        elseif (i > nc)
-            % tangential direction 1
-            x_n = mu(i - nc)*x(i - nc);
-            x(i) = min(max(-x_n, xnew), x_n);
-        else
-            % normal direction
-            x(i) = max(0, xnew);
-        end
+        x(i) = max(0, xnew(1));
+        lim = mu(i)*x(i);
+
+        % Tangent 1
+        xnew = x(i+1*nc) - (A(i+1*nc,:)*x + b(i+1*nc))/D(i+1*nc);
+        x(i+1*nc) = min(max(-lim, xnew), lim);
+
+        % Tangent 2
+        xnew = x(i+2*nc) - (A(i+2*nc,:)*x + b(i+2*nc))/D(i+2*nc);
+        x(i+2*nc) = min(max(-lim, xnew), lim);
     end
 end
 
