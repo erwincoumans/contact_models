@@ -61,10 +61,13 @@ while (3*nc*kappa > tol1)
         while (true)
             x = x0 + t*dx;
             s = [A*x - b; mu.^2.*x(1:nc).^2 - x(nc+1:2*nc).^2 - x(2*nc+1:3*nc).^2];
-            v = sum(log(s(~mask))) - sum(a0*s(mask).^2 + a1*s(mask) + a2);
-            f = 0.5*x'*H*x + x'*c - kappa*v;
-            if (f <= f0 + alpha*t*(grad'*dx)) && ~any(s < 0 & ~mask)
-                break
+            % Check that no new constraint violations are introduced
+            if ~any(s < 0 & ~mask)
+                v = sum(log(s(~mask))) - sum(a0*s(mask).^2 + a1*s(mask) + a2);
+                f = 0.5*x'*H*x + x'*c - kappa*v;
+                if (f <= f0 + alpha*t*(grad'*dx))
+                    break
+                end
             end
             t = beta*t;
         end
