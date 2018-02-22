@@ -1,5 +1,4 @@
 clear
-close all
 subplot(2,3,1)
 example_sphere
 subplot(2,3,2)

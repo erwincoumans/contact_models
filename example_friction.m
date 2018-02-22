@@ -9,7 +9,7 @@ params = struct('h', h, 'mu', mu, 'm', m, 'step_fun', []);
 
 x0 = zeros(6,1);
 u = [-1, 0.5, 0]';
-N = 11;
+N = 31;
 
 %% Simulation
 time = 0:h:h*(N-1);
