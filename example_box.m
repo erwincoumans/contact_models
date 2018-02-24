@@ -2,7 +2,7 @@
 clear
 
 % Parameters
-h = 0.02;
+h = 0.01;
 mu = 0.9*ones(8,1);
 m = 0.2;
 lx = 0.01;
@@ -14,7 +14,7 @@ params = struct('h', h, 'mu', mu, 'm', m, 'lx', lx, 'ly', ly, 'lz', lz, 'w', w, 
 
 x0 = [0, 0, lz-w, 1, 0, 0, 0, zeros(1, 6)]';
 u = [2, 0, 0, 0, 0, 0]';
-N = 101;
+N = 2001;
 
 %% Simulation
 time = 0:h:h*(N-1);

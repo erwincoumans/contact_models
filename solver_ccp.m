@@ -34,7 +34,7 @@ end
 
 % Solve for contact impulses (Projected Gauss-Seidel)
 x = zeros(3*nc,1);
-for r = 1:300
+for r = 1:30
     for i = 1:nc
         % Block update
         xnew = x(i+nt) - (A(i+nt,:)*x + b(i+nt))/D(i);

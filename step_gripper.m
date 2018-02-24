@@ -46,20 +46,8 @@ J = [ zeros(1,8)              0  0 -1   % gripper lift height   (normal)
 R = quat2rotm(q(4:7)');
 J(:,4:6) = J(:,4:6)*R;
 
-% Step without contact impulses
-v_next = (v + M\Fext*h);
-q_next = q;
-q_next(1:7) = int_body(q(1:7), v_next(1:6), h);
-q_next(8:12) = q(8:12) + h*v_next(7:11);
-
-psi2 = [r - q_next(12)
-       q_next(12)
-       q_next(8) - q_next(2) - r
-       q_next(2) - q_next(9) - r
-       q_next(3) - r];
-
 % Identify active contacts
-c_active = psi2 < 0.01;
+c_active = psi < 0.1;
 J = J([c_active; c_active; c_active],:);
 psi = psi(c_active);
 mu = mu(c_active);
@@ -68,10 +56,15 @@ x = NaN(3*size(c_active,1),1);
 if any(c_active)
     % Solve contact dynamics
     [v_next, x_active]  = step_fun(v, Fext, M, J, mu, psi, h);
-    q_next(1:7) = int_body(q(1:7), v_next(1:6), h);
-    q_next(8:12) = q(8:12) + h*v_next(7:11);
     x([c_active; c_active; c_active]) = x_active;
+else
+    % Step without contact impulses
+    v_next = (v + M\Fext*h);
 end
+
+q_next = q;
+q_next(1:7) = int_body(q(1:7), v_next(1:6), h);
+q_next(8:12) = q(8:12) + h*v_next(7:11);
 
 st = [q_next; v_next];
 end

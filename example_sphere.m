@@ -2,34 +2,37 @@
 clear
 
 % Parameters
-h = 0.02;
-mu = 0.2;
+h = 0.01;
+mu = 0.3;
 m = 0.2;
 r = 0.05;
 params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'step_fun', []);
 
-x0 = [0, 0, 0.025, 1, 0, 0, 0, zeros(1, 6)]';
+x0 = [0, 0, r+0.15, 1, 0, 0, 0, zeros(1, 6)]';
 u = zeros(6, 1);
-N = 11;
+N = 51;
 
 %% Simulation
 time = 0:h:h*(N-1);
 
 params.step_fun = @solver_lcp;
-[x1, ~] = stepper(params, @step_sphere, x0, u, N);
+[x1, f1] = stepper(params, @step_sphere, x0, u, N);
+params.step_fun = @solver_blcp;
+[x2, f2] = stepper(params, @step_sphere, x0, u, N);
 params.step_fun = @solver_ccp;
-[x2, ~] = stepper(params, @step_sphere, x0, u, N);
+[x3, f3] = stepper(params, @step_sphere, x0, u, N);
 params.step_fun = @solver_convex;
-[x3, ~] = stepper(params, @step_sphere, x0, u, N);
+[x4, f4] = stepper(params, @step_sphere, x0, u, N);
 
 %% Plotting
 plot(time, x1(3,:), '-')
 hold on
-plot(time, x2(3,:), '--')
-plot(time, x3(3,:), ':')
+plot(time, x2(3,:), '-.')
+plot(time, x3(3,:), '--')
+plot(time, x4(3,:), ':')
 hold off
 
-legend('LCP','CCP','Convex')
+legend('LCP','BLCP','CCP','Convex')
 xlabel('Time (sec)')
 ylabel('Sphere Height (m)')
 a = gca;

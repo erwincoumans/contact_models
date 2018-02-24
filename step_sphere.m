@@ -20,7 +20,7 @@ I = M(4:6,4:6);
 Fext = [0; 0; -9.81*m; -cross(omega, I*omega)] + u;
 
 % Contact normal distances (gaps)
-psi = q(3);
+psi = q(3) - r;
 
 % Jacobian for contacts
 J = [ 0  0  1  0  0  0
@@ -29,16 +29,16 @@ J = [ 0  0  1  0  0  0
 R = quat2rotm(q(4:7)');
 J(:,4:6) = J(:,4:6)*R;
 
-% Step without contact impulses
-v_next = (v + M\Fext*h);
-q_next = int_body(q, v_next, h);
-x = [0; 0; 0];
-
 % Identify active contacts
-if (q_next(3) < 0.01)
+if (psi < 0.1)
     [v_next, x]  = step_fun(v, Fext, M, J, mu, psi, h);
-    q_next = int_body(q, v_next, h);
+else
+    % Step without contact impulses
+    v_next = (v + M\Fext*h);
+    x = [0; 0; 0];
 end
+
+q_next = int_body(q, v_next, h);
 
 st = [q_next; v_next];
 end
