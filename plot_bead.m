@@ -1,68 +1,55 @@
-function plot_bead(params, x, f, filename)
+function plot_bead(r, w, q, f)
 
-% Parameters
-h = params.h;
-r = params.r; % disk radius
-w = params.w; % slot half-width
-
-% Disk
-angles = linspace(0, 2*pi, 30);
-xs = r*cos(angles);
-ys = r*sin(angles);
+m = 16;
+[x, y, z] = sphere(m-1);
+x = r*x;
+y = r*y;
+z = r*z;
 
 % Plotting
-lims = [-1 1 -1 1]*6*w;
+lims = [-2*r 2*r -2*r 2*r -1.1*w 1.1*w];
 clf
-hf = gcf;
-patch(2*lims([1 2 2 1]), [2*lims([3 3]) -w -w], 0.8+[0 0 0]);
-patch(2*lims([1 2 2 1]), [ w  w 2*lims([4 4])], 0.8+[0 0 0]);
+patch(lims([1 2 2 1]), lims([3 3 4 4]),-w*ones(1,4), 0.8+[0 0 0]);
+patch(lims([1 2 2 1]), lims([3 3 4 4]), w*ones(1,4), 0.8+[0 0 0]);
+hold on
+grid on
 
-h_disk = patch(x(1) + xs, x(2) + ys, 0.8+[0 0 0]);
-h_line = line([x(1) lims(2)], [x(2) 0], 'Color', 'k', 'Linewidth', 2);
-
-h_quiv1 = [];
+h_sphere = surf(x + q(1,1), y + q(2,1), z + q(3,1), 'FaceColor', [0 0 1], 'FaceAlpha',0.3);
+h_quiv = {};
 if (nargin >= 3)
-    hold on
-    f([1,3],:) = -f([1,3],:);
-    h_quiv1 = quiver(x(1)+[0;0], [w;-w], [0;0], [0;0], 0, 'b');
-    h_quiv2 = quiver(x(1)+[0;0], x(2)+[r;-r], [0;0], [0;0], 0, 'r');
-    hold off
+    h_quiv{1} = quiver3(q(1,1), q(2,1), q(3,1) - r, f(3,1), f(5,1), f(1,1), 'r');
+    h_quiv{2} = quiver3(q(1,1), q(2,1), q(3,1) + r,-f(4,1),-f(6,1), f(2,1), 'r');
+    h_quiv{1}.LineWidth = 2;
+    h_quiv{1}.AutoScale = 'off';
+    h_quiv{2}.LineWidth = 2;
+    h_quiv{2}.AutoScale = 'off';
 end
+hold off
+axis equal
 axis(lims)
+view(12,2)
 
-if (nargin < 4)
-    filename = '';
-end
-
-for k = 1:size(x,2)
+for k = 1:size(q,2)
     % Plotting
-    h_disk.XData = x(1,k) + xs;
-    h_disk.YData = x(2,k) + ys;
-    h_line.XData(1) = x(1,k);
-    h_line.YData(1) = x(2,k);
-    if ~isempty(h_quiv1) && (k > 1)
-        h_quiv1.XData = x(1,k)+[0;0];
-        h_quiv1.UData = -f(3:4,k);
-        h_quiv1.VData = -f(1:2,k);
-        h_quiv2.XData = x(1,k)+[0;0];
-        h_quiv2.YData = x(2,k)+[r;-r];
-        h_quiv2.UData = f(3:4,k);
-        h_quiv2.VData = f(1:2,k);
+    h_sphere.XData = x + q(1,k);
+    h_sphere.YData = y + q(2,k);
+    h_sphere.ZData = z + q(3,k);
+    if ~isempty(h_quiv) && (k > 1)
+        h_quiv{1}.XData = q(1,k);
+        h_quiv{1}.YData = q(2,k);
+        h_quiv{1}.ZData = q(3,k) - r;
+        h_quiv{1}.UData = f(3,k);
+        h_quiv{1}.VData = f(5,k);
+        h_quiv{1}.WData = f(1,k);
+        h_quiv{2}.XData = q(1,k);
+        h_quiv{2}.YData = q(2,k);
+        h_quiv{2}.ZData = q(3,k) + r;
+        h_quiv{2}.UData =-f(4,k);
+        h_quiv{2}.VData =-f(6,k);
+        h_quiv{2}.WData = f(2,k);
     end
     axis(lims)
     
-    if ~isempty(filename)
-        drawnow
-        frame = getframe(hf);
-        im = frame2im(frame);
-        [im_inds, color_map] = rgb2ind(im, 256);
-        if (k == 1)
-            imwrite(im_inds, color_map, filename, 'gif', 'Loopcount', Inf);
-        else
-            imwrite(im_inds, color_map, filename, 'gif', 'WriteMode', 'append');
-        end
-    else
-        pause(h);
-    end
+    pause(0.1);
 end
 end

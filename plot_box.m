@@ -22,20 +22,20 @@ grid on
 
 Y = reshape(bsxfun(@plus, q(1:3,1)', X*quat2rotm(q(4:7,1)')'), 5, 6);
 h_box = surf(Y(:,1:2)', Y(:,3:4)', Y(:,5:6)','FaceAlpha',0.3);
-h_quiv = cell(1,8);
+h_quiv = {};
 if (nargin >= 3)
-    for i = 1:4
-        h_quiv{i+0} = quiver3(Y(1:4,1), Y(1:4,3), Y(1:4,5), ...
-            f(9:12,1), f(17:20,1), f(1:4,1), 'r');
-    end
-    for i = 1:4
-        h_quiv{i+4} = quiver3(Y(1:4,2), Y(1:4,4), Y(1:4,6), ...
-            -f(13:16,1), f(21:24,1), -f(5:8,1), 'r');
+    h_quiv{1} = quiver3(Y(1:4,1), Y(1:4,3), Y(1:4,5), ...
+        f(9:12,1), f(17:20,1), f(1:4,1), 'r');
+    h_quiv{2} = quiver3(Y(1:4,2), Y(1:4,4), Y(1:4,6), ...
+        -f(13:16,1), f(21:24,1), -f(5:8,1), 'r');
+    for i = 1:2
+        h_quiv{i}.LineWidth = 2;
+        h_quiv{i}.AutoScale = 'off';
     end
 end
 hold off
 axis(lims)
-view(12,1)
+view(12,2)
 
 if (nargin < 4)
     filename = '';
@@ -48,23 +48,19 @@ for k = 1:size(q,2)
     h_box.YData = Y(:,3:4)';
     h_box.ZData = Y(:,5:6)';
     zlim([-w w])
-    if ~isempty(h_quiv{1}) && (k > 1)
-        for i = 1:4
-            h_quiv{i+0}.XData = Y(1:4,1);
-            h_quiv{i+0}.YData = Y(1:4,3);
-            h_quiv{i+0}.ZData = Y(1:4,5);
-            h_quiv{i+0}.UData = f(9:12,k);
-            h_quiv{i+0}.VData = f(17:20,k);
-            h_quiv{i+0}.WData = f(1:4,k);
-        end
-        for i = 1:4
-            h_quiv{i+4}.XData = Y(1:4,2);
-            h_quiv{i+4}.YData = Y(1:4,4);
-            h_quiv{i+4}.ZData = Y(1:4,6);
-            h_quiv{i+4}.UData = -f(13:16,k);
-            h_quiv{i+4}.VData = f(21:24,k);
-            h_quiv{i+4}.WData = -f(5:8,k);
-        end
+    if ~isempty(h_quiv) && (k > 1)
+        h_quiv{1}.XData = Y(1:4,1);
+        h_quiv{1}.YData = Y(1:4,3);
+        h_quiv{1}.ZData = Y(1:4,5);
+        h_quiv{1}.UData = f(9:12,k);
+        h_quiv{1}.VData = f(17:20,k);
+        h_quiv{1}.WData = f(1:4,k);
+        h_quiv{2}.XData = Y(1:4,2);
+        h_quiv{2}.YData = Y(1:4,4);
+        h_quiv{2}.ZData = Y(1:4,6);
+        h_quiv{2}.UData = -f(13:16,k);
+        h_quiv{2}.VData = f(21:24,k);
+        h_quiv{2}.WData = -f(5:8,k);
     end
     axis(lims)
     

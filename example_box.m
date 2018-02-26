@@ -14,7 +14,7 @@ params = struct('h', h, 'mu', mu, 'm', m, 'lx', lx, 'ly', ly, 'lz', lz, 'w', w, 
 
 x0 = [0, 0, lz-w, 1, 0, 0, 0, zeros(1, 6)]';
 u = [2, 0, 0, 0, 0, 0]';
-N = 2001;
+N = 201;
 
 %% Simulation
 time = 0:h:h*(N-1);

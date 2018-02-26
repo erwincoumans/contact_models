@@ -13,29 +13,30 @@ N = 51;
 %% Simulation
 time = 0:h:h*(N-1);
 [x1, x2, x3, x4] = deal(repmat(x0, 1, N));
+[f1, f2, f3, f4] = deal(zeros(3, N));
 
 params.step_fun = @solver_lcp;
 for k = 2:N
     u = [mu*9.81*m + 5*(0.2 - x1(4,k-1)); 0; 0];
-    [x1(:,k), ~] = step_tooltip(params, x1(:,k-1), u);
+    [x1(:,k), f1(:,k)] = step_tooltip(params, x1(:,k-1), u);
 end
 
 params.step_fun = @solver_blcp;
 for k = 2:N
     u = [mu*9.81*m + 5*(0.2 - x2(4,k-1)); 0; 0];
-    [x2(:,k), ~] = step_tooltip(params, x2(:,k-1), u);
+    [x2(:,k), f2(:,k)] = step_tooltip(params, x2(:,k-1), u);
 end
 
 params.step_fun = @solver_ccp;
 for k = 2:N
     u = [mu*9.81*m + 5*(0.2 - x3(4,k-1)); 0; 0];
-    [x3(:,k), ~] = step_tooltip(params, x3(:,k-1), u);
+    [x3(:,k), f3(:,k)] = step_tooltip(params, x3(:,k-1), u);
 end
 
 params.step_fun = @solver_convex;
 for k = 2:N
     u = [mu*9.81*m + 5*(0.2 - x4(4,k-1)); 0; 0];
-    [x4(:,k), ~] = step_tooltip(params, x4(:,k-1), u);
+    [x4(:,k), f4(:,k)] = step_tooltip(params, x4(:,k-1), u);
 end
 
 %% Plotting
