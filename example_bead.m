@@ -5,11 +5,10 @@ clear
 h = 0.01;
 mu = 0.3*ones(2,1);
 m = 0.2;
-r = 0.02;
-l = 0.05;
-w = 0.021;
+r = 0.05;
+w = 0.051;
 
-params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'l', l, 'w', w, 'step_fun', []);
+params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'w', w, 'step_fun', []);
 
 x0 = [0, 0, r-w, 0, 0, 0]';
 u = [1, 0, 0]';

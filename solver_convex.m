@@ -27,8 +27,8 @@ b = c + [psi/h; zeros(2*nc,1)];
 %% Convex Quadratic Program
 
 % Contact smoothing
-Rmax = 100;
-Rmin = 0.01;
+Rmax = 100*(0.01/h);
+Rmin = 0.01*(0.01/h);
 wmax = 0.1;
 R = diag((Rmin + (Rmax - Rmin)*[psi; psi; psi]/wmax));
 
