@@ -25,12 +25,12 @@ u = {@(x) zeros(6, 1)
      @(x) [1, 0, 0]'
      @(x) [2, 0, 0, 0, 0, 0]'
      @(x) [-4 4 0 0 5]'};
-N = {51; 51; 51; 51; 201; 101};
+N = {6; 6; 6; 6; 21; 11};
 steppers = {@step_sphere; @step_tooltip; @step_tooltip; ...
            @step_bead;   @step_box;     @step_gripper};
 solvers = {@solver_lcp; @solver_blcp; @solver_ccp; @solver_convex};
 
-[dmean, dsd] = deal(NaN(numel(steppers), numel(solvers)));
+[dmean, dmax, dsd] = deal(NaN(numel(steppers), numel(solvers)));
 for i = 1:numel(steppers)
     if (i == 5)
         params.w = 0.021;
@@ -40,6 +40,7 @@ for i = 1:numel(steppers)
         params.step_fun = solvers{j};
         [dm, x1, x2, f1, f2] = stepper_test(params, steppers{i}, x0{i}, u{i}, N{i});
         dmean(i,j) = mean(dm);
+        dmax(i,j) = max(dm);
         dsd(i,j) = std(dm);
     end
 end
@@ -50,19 +51,23 @@ b = bar(dmean);
 for i = 1:numel(b)
     b(i).FaceColor = colors(i,:);
 end
-hold on
-e = errorbar(dmean,dsd,'k.');
-e(1).XData = (1:6) - 0.27;
-e(2).XData = (1:6) - 0.09;
-e(3).XData = (1:6) + 0.09;
-e(4).XData = (1:6) + 0.27;
+% hold on
+% e = errorbar(dmean,dsd,'k.');
+% e(1).XData = (1:6) - 0.27;
+% e(2).XData = (1:6) - 0.09;
+% e(3).XData = (1:6) + 0.09;
+% e(4).XData = (1:6) + 0.27;
 
-% legend('LCP','BLCP','CCP','Convex')
+legend('LCP','BLCP','CCP','Convex')
 ylabel('Discrepancy (m)')
 a = gca;
 a.YScale = 'log';
 a.XTick = 1:6;
 a.XTickLabel = {'Sphere','Sliding 1','Sliding 2','Sliding 3','Wedging','Grasp'};
 a.XTickLabelRotation = 45;
-a.FontSize = 14;
+a.FontSize = 16;
 a.FontWeight = 'bold';
+xlim([0,7])
+
+f = gcf;
+f.Position = [234 536 738 547];
