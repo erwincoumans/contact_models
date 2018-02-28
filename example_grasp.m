@@ -29,37 +29,39 @@ params.step_fun = @solver_convex;
 [x4, f4] = stepper(params, @step_gripper, x0, u, N);
 
 %% Plotting
+hs(1) = subplot(2,1,1);
 plot(time, x1(3,:), '-')
 hold on
 plot(time, x2(3,:), '-.')
 plot(time, x3(3,:), '--')
 plot(time, x4(3,:), ':')
 hold off
+ylim([0.08, 0.1])
+xlim([0 1])
+ylabel('Sphere Height (m)')
+
+% Plotting
+hs(2) = subplot(2,1,2);
+plot(time, x1(8,:)-x1(9,:), '-')
+hold on
+plot(time, x2(8,:)-x2(9,:), '-.')
+plot(time, x3(8,:)-x3(9,:), '--')
+plot(time, x4(8,:)-x4(9,:), ':')
+hold off
+ylim([0.098, 0.105])
 
 legend('LCP','BLCP','CCP','Convex')
 xlabel('Time (sec)')
-ylabel('Sphere Height (m)')
-a = gca;
-for k = 1:numel(a.Children)
-    a.Children(k).LineWidth = 2;
-end
-a.FontSize = 14;
-a.FontWeight = 'bold';
+ylabel('Finger Gap (m)')
 
-%% Plotting
-% plot(time, x1(8,:)-x1(9,:), '-')
-% hold on
-% plot(time, x2(8,:)-x2(9,:), '-.')
-% plot(time, x3(8,:)-x3(9,:), '--')
-% plot(time, x4(8,:)-x4(9,:), ':')
-% hold off
-% 
-% legend('LCP','BLCP','CCP','Convex')
-% xlabel('Time (sec)')
-% ylabel('Finger Separation (m)')
-% a = gca;
-% for k = 1:numel(a.Children)
-%     a.Children(k).LineWidth = 2;
-% end
-% a.FontSize = 14;
-% a.FontWeight = 'bold';
+for i = 1:numel(hs)
+    for j = 1:numel(hs(i).Children)
+        hs(i).Children(j).LineWidth = 2;
+    end
+    hs(i).FontSize = 16;
+    hs(i).FontWeight = 'bold';
+    hs(i).Position(1) = 0.18;
+    hs(i).Position(4) = 0.38;
+end
+f = gcf;
+f.Position = [236   389 588 551];
