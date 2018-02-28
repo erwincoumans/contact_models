@@ -1,3 +1,4 @@
+%% Setup
 clear
 
 h = 0.01;
@@ -21,7 +22,7 @@ x0 = {[0, 0, r+0.15, 1, 0, 0, 0, zeros(1, 6)]'
 mus = {0.3; 0.3; 0.3; 0.3*ones(2,1); 0.9*ones(8,1); 0.3*ones(5,1)};
 u = {@(x) zeros(6, 1)
      @(x) [-1, 0.6, 0]'
-     @(x) [1, 0, 0]'%[mu*9.81*m + 5*(0.2 - x(4)); 0; 0]
+     @(x) [mu*9.81*m + 5*(0.2 - x(4)), 0, 0]'
      @(x) [1, 0, 0]'
      @(x) [2, 0, 0, 0, 0, 0]'
      @(x) [-4 4 0 0 5]'};
@@ -30,6 +31,7 @@ steppers = {@step_sphere; @step_tooltip; @step_tooltip; ...
            @step_bead;   @step_box;     @step_gripper};
 solvers = {@solver_lcp; @solver_blcp; @solver_ccp; @solver_convex};
 
+%% Simulations
 [dmean, dmax, dsd] = deal(NaN(numel(steppers), numel(solvers)));
 for i = 1:numel(steppers)
     if (i == 5)
