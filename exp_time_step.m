@@ -25,8 +25,8 @@ u = {@(x) zeros(6, 1)
      @(x) [mu*9.81*m + 5*(0.2 - x(4)), 0, 0]'
      @(x) [1, 0, 0]'
      @(x) [2, 0, 0, 0, 0, 0]'
-     @(x) [-4 4 0 0 5]'};
-N = {6; 6; 6; 6; 21; 11};
+     @(x) [-14 14 0 0 10]'};
+N = {6; 6; 6; 6; 21; 6};
 steppers = {@step_sphere; @step_tooltip; @step_tooltip; ...
            @step_bead;   @step_box;     @step_gripper};
 solvers = {@solver_lcp; @solver_blcp; @solver_ccp; @solver_convex};
