@@ -22,45 +22,28 @@ Fext = [0; 0; -9.81*m; -cross(omega, I*omega); u];
 
 % Contact gap distances
 psi = [r - q(12)
-       q(12)
        q(8) - q(2) - r
        q(2) - q(9) - r
        q(3) - r];
 
 % Jacobian for contacts
 J = [ zeros(1,8)              0  0 -1   % gripper lift height   (normal)
-      zeros(1,8)              0  0  1   % gripper lower height  (normal)
       0 -1  0  0  0  0  1  0  0  0  0   % finger1-disk          (normal)
       0  1  0  0  0  0  0 -1  0  0  0   % finger2-disk          (normal)
       0  0  1  0  0  0  0  0  0  0  0   % disk-floor            (normal)
       zeros(1,8)              0  1  0   % gripper lift height  (tangent)
-      zeros(1,8)              0 -1  0   % gripper lower height (tangent)
       0  0  1  r  0  0  0  0  0  0 -1   % finger1-disk         (tangent)
       0  0 -1  r  0  0  0  0  0  0  1   % finger2-disk         (tangent)
       0  1  0  r  0  0  0  0  0  0  0   % disk-floor           (tangent)
       zeros(1,8)             -1  0  0   % gripper lift height    (other)
-      zeros(1,8)             -1  0  0   % gripper lower height   (other)
      -1  0  0  0  0 -r  0  0  0  0  0   % finger1-disk           (other)
      -1  0  0  0  r  0  0  0  0  0  0   % finger2-disk           (other)
      -1  0  0  0  0  r  0  0  0  0  0]; % disk-floor             (other)
 R = quat2rotm(q(4:7)');
 J(:,4:6) = J(:,4:6)*R;
 
-% Identify active contacts
-c_active = psi < 0.1;
-J = J([c_active; c_active; c_active],:);
-psi = psi(c_active);
-mu = mu(c_active);
-
-x = NaN(3*size(c_active,1),1);
-if any(c_active)
-    % Solve contact dynamics
-    [v_next, x_active]  = step_fun(v, Fext, M, J, mu, psi, h);
-    x([c_active; c_active; c_active]) = x_active;
-else
-    % Step without contact impulses
-    v_next = (v + M\Fext*h);
-end
+% Solve contact dynamics
+[v_next, x]  = step_fun(v, Fext, M, J, mu, psi, h);
 
 q_next = q;
 q_next(1:7) = int_body(q(1:7), v_next(1:6), h);

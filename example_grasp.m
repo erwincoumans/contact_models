@@ -6,7 +6,7 @@ clear
 
 % Parameters
 h = 0.01;
-mu = 0.3*ones(5,1);
+mu = 0.3*ones(4,1);
 m = 0.2;
 r = 0.05;
 m_g = 2.0;
