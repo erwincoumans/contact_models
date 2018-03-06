@@ -49,7 +49,7 @@ hold off
 
 legend('LCP','BLCP','CCP','Convex')
 xlabel('Time (sec)')
-ylabel('Tool Height (m)')
+ylabel('Particle Height (m)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;

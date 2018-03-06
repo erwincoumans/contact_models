@@ -31,6 +31,7 @@ Rmax = 100*(0.01/h);
 Rmin = 0.01*(0.01/h);
 wmax = 0.1;
 R = diag(Rmin + (Rmax - Rmin)*[psi; psi; psi]/wmax);
+% R = diag((Rmax - Rmin)/1.7183*(exp([psi; psi; psi]/wmax) - 1) + Rmin);
 
 % Constraints
 Ac = [A(1:nc,:);... % no penetration

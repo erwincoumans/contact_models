@@ -33,8 +33,8 @@ hold off
 axis equal
 
 legend('LCP','BLCP','CCP','Convex')
-xlabel('Tool X-Position (m)')
-ylabel('Tool Y-Position (m)')
+xlabel('Particle X-Position (m)')
+ylabel('Particle Y-Position (m)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;

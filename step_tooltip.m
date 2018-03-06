@@ -24,16 +24,8 @@ J = [ 0  0  1   % normal
       1  0  0   % tangent
       0  1  0]; % other
 
-% Step without contact impulses
-v_next = (v + M\Fext*h);
+[v_next, x]  = step_fun(v, Fext, M, J, mu, psi, h);
 q_next = q + h*v_next;
-x = [0; 0; 0];
-
-% Identify active contacts
-if (q_next(3) < 0.01)
-    [v_next, x]  = step_fun(v, Fext, M, J, mu, psi, h);
-    q_next = q + h*v_next;
-end
 
 st = [q_next; v_next];
 end
