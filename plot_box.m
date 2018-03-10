@@ -15,13 +15,14 @@ X = [x y z];
 % Plotting
 lims = [-3*lx 3*lx -3*ly 3*ly -1.1*w 1.1*w];
 clf
+hf = gcf;
 patch(lims([1 2 2 1]), lims([3 3 4 4]),-w*ones(1,4), 0.8+[0 0 0]);
 patch(lims([1 2 2 1]), lims([3 3 4 4]), w*ones(1,4), 0.8+[0 0 0]);
 hold on
 grid on
 
 Y = reshape(bsxfun(@plus, q(1:3,1)', X*quat2rotm(q(4:7,1)')'), 5, 6);
-h_box = surf(Y(:,1:2)', Y(:,3:4)', Y(:,5:6)','FaceAlpha',0.3);
+h_box = surf(Y(:,1:2)', Y(:,3:4)', Y(:,5:6)', 'FaceColor', [0 0 1], 'FaceAlpha', 0.3);
 h_quiv = {};
 if (nargin >= 3)
     h_quiv{1} = quiver3(Y(1:4,1), Y(1:4,3), Y(1:4,5), ...
@@ -65,14 +66,15 @@ for k = 1:size(q,2)
     axis(lims)
     
     if ~isempty(filename)
-        drawnow
-        frame = getframe(hf);
-        im = frame2im(frame);
-        [im_inds, color_map] = rgb2ind(im, 256);
-        if (k == 1)
-            imwrite(im_inds, color_map, filename, 'gif', 'Loopcount', Inf);
-        else
-            imwrite(im_inds, color_map, filename, 'gif', 'WriteMode', 'append');
+        if mod(k,10) == 1
+            frame = getframe(hf);
+            im = frame2im(frame);
+            [im_inds, color_map] = rgb2ind(im, 256);
+            if (k == 1)
+                imwrite(im_inds, color_map, filename, 'gif', 'Loopcount', Inf, 'DelayTime', 0.1);
+            else
+                imwrite(im_inds, color_map, filename, 'gif', 'WriteMode', 'append', 'DelayTime', 0.1);
+            end
         end
     else
         pause(h);

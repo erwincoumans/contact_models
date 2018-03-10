@@ -1,4 +1,4 @@
-function plot_gripper(r, q, f)
+function plot_gripper(r, q, f, filename)
 
 % Sphere
 m = 16;
@@ -21,6 +21,7 @@ zw(2,:) = 4*r + 2*l;
 lims = [-3 3 -3 3 0 4]*r;
 lims(6) = 4*r + 2*l;
 clf
+hf = gcf;
 patch(lims([1 2 2 1]), lims([3 3 4 4]), lims([5 5 5 5]), 0.8+[0 0 0]);
 Y = reshape(bsxfun(@plus, q(1:3,1)', X*quat2rotm(q(4:7,1)')'), m, 3*m);
 hold on
@@ -34,7 +35,7 @@ h_w = surf(xw, yw, zw, 'FaceColor', 0.3+[0 0 0], 'FaceAlpha', 1);
 h_quiv = [];
 if (nargin >= 3)
     h_quiv = quiver3(q(1,1) + [0 0 0], q(2,1) + [r -r 0], q(3,1) + [0 0 -r],...
-        -f(13:15,1)', [-f(3,1) f(4,1) f(10,1)], [f(8,1) -f(9,1) f(5,1)], 'r');
+        -f(10:12,1)', [-f(2,1) f(3,1) f(8,1)], [f(6,1) -f(7,1) f(4,1)], 'r');
     h_quiv.LineWidth = 2;
     h_quiv.AutoScale = 'off';
     h_quiv.MaxHeadSize = 0.5;
@@ -43,6 +44,10 @@ hold off
 axis equal
 axis(lims)
 view(70,5)
+
+if (nargin < 4)
+    filename = '';
+end
 
 for k = 1:size(q,2)
     % Plotting
@@ -64,12 +69,23 @@ for k = 1:size(q,2)
         h_quiv.XData = q(1,k) + [0 0 0];
         h_quiv.YData = q(2,k) + [r -r 0];
         h_quiv.ZData = q(3,k) + [0 0 -r];
-        h_quiv.UData = -f(13:15,k)';
-        h_quiv.VData = [-f(3,k) f(4,k) f(10,k)];
-        h_quiv.WData = [f(8,k) -f(9,k) f(5,k)];
+        h_quiv.UData = -f(10:12,k)';
+        h_quiv.VData = [-f(2,k) f(3,k) f(8,k)];
+        h_quiv.WData = [f(6,k) -f(7,k) f(4,k)];
     end
     axis(lims)
 
-    pause(0.1);
+    if ~isempty(filename)
+        frame = getframe(hf);
+        im = frame2im(frame);
+        [im_inds, color_map] = rgb2ind(im, 256);
+        if (k == 1)
+            imwrite(im_inds, color_map, filename, 'gif', 'Loopcount', Inf, 'DelayTime', 0.1);
+        else
+            imwrite(im_inds, color_map, filename, 'gif', 'WriteMode', 'append', 'DelayTime', 0.1);
+        end
+    else
+        pause(0.1);
+    end
 end
 end
