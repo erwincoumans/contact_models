@@ -24,19 +24,22 @@ params.step_fun = @solver_ccp;
 params.step_fun = @solver_convex;
 [x4, f4] = stepper(params, @step_sphere, x0, u, N);
 
+x5 = analytic_sphere(params, x0(3), time);
+
 %% Plotting
 plot(time, x1(3,:), '-')
 hold on
 plot(time, x2(3,:), '-.')
 plot(time, x3(3,:), '--')
 plot(time, x4(3,:), ':')
+plot(time, x5(3,:), '-k')
 hold off
 
-legend('LCP','BLCP','CCP','Convex')
+legend('LCP','BLCP','CCP','Convex','Analytic')
 xlabel('Time (sec)')
 ylabel('Sphere Height (m)')
 a = gca;
-for k = 1:numel(a.Children)
+for k = 2:numel(a.Children)
     a.Children(k).LineWidth = 2;
 end
 a.FontSize = 14;

@@ -26,19 +26,22 @@ params.step_fun = @solver_ccp;
 params.step_fun = @solver_convex;
 [x4, f4] = stepper(params, @step_bead, x0, u, N);
 
+x5 = analytic_bead(params, u(1), time);
+
 %% Plotting
 plot(time, x1(4,:), '-')
 hold on
 plot(time, x2(4,:), '-.')
 plot(time, x3(4,:), '--')
 plot(time, x4(4,:), ':')
+plot(time, x5(4,:), '-k')
 hold off
 
-legend('LCP','BLCP','CCP','Convex')
+legend('LCP','BLCP','CCP','Convex','Analytic')
 xlabel('Time (sec)')
 ylabel('Sphere Velocity (m/s)')
 a = gca;
-for k = 1:numel(a.Children)
+for k = 2:numel(a.Children)
     a.Children(k).LineWidth = 2;
 end
 a.FontSize = 14;
