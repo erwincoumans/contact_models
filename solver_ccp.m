@@ -19,10 +19,10 @@ A = J*(M\J');
 A = (A + A')/2; % should be symmetric
 
 % Resulting contact velocities if all contact impulses are 0
-c = J*(v_prev + M\Fext*h);
+b = J*(v_prev + M\Fext*h);
 
 % Baumgarte stabilization
-b = c + [psi/h; zeros(2*nc,1)];
+btilde = b + [psi/h; zeros(2*nc,1)];
 
 %% Cone Complementarity Problem (CCP)
 nt = [0, nc, 2*nc]; % normal and tangent indices
@@ -37,7 +37,7 @@ x = zeros(3*nc,1);
 for r = 1:30
     for i = 1:nc
         % Block update
-        xnew = x(i+nt) - (A(i+nt,:)*x + b(i+nt))/D(i);
+        xnew = x(i+nt) - (A(i+nt,:)*x + btilde(i+nt))/D(i);
         % Project impulse into friction cone
         x(i+nt) = project(xnew, mu(i));
     end

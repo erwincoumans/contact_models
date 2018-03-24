@@ -19,10 +19,10 @@ A = J*(M\J');
 A = (A + A')/2; % should be symmetric
 
 % Resulting contact velocities if all contact impulses are 0
-c = J*(v_prev + M\Fext*h);
+b = J*(v_prev + M\Fext*h);
 
 % Baumgarte stabilization
-b = c + [psi/h; zeros(2*nc,1)];
+btilde = b + [psi/h; zeros(2*nc,1)];
 
 %% Convex Quadratic Program
 
@@ -36,12 +36,12 @@ R = diag(Rmin + (Rmax - Rmin)*[psi; psi; psi]/wmax);
 % Constraints
 Ac = [A(1:nc,:);... % no penetration
       eye(nc)  zeros(nc,2*nc)]; % no attractive contact forces
-bc = [-b(1:nc); zeros(nc,1)];
+bc = [-btilde(1:nc); zeros(nc,1)];
 
-% The substitutions A+R=>A and c=>b improve agreement with LCP
+% The substitutions A+R=>A and b=>btilde improve agreement with LCP
 
 % Solve for contact impulses (Interior-point)
-x = interior_point(A + R, c, Ac, bc, mu);
+x = interior_point(A + R, b, Ac, bc, mu);
 
 %% Integrate velocity and pose
 v_next = v_prev + M\(J'*x + Fext*h);

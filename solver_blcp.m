@@ -19,10 +19,10 @@ A = J*(M\J');
 A = (A + A')/2; % should be symmetric
 
 % Resulting contact velocities if all contact impulses are 0
-c = J*(v_prev + M\Fext*h);
+b = J*(v_prev + M\Fext*h);
 
 % Baumgarte stabilization
-b = c + [psi/h; zeros(2*nc,1)];
+btilde = b + [psi/h; zeros(2*nc,1)];
 
 %% Linear Complementarity Problem with Bounds (BLCP)
 D = diag(A);
@@ -32,16 +32,16 @@ x = zeros(3*nc,1);
 for r = 1:30
     for i = 1:nc
         % Normal
-        xnew = x(i) - (A(i,:)*x + b(i))/D(i);
+        xnew = x(i) - (A(i,:)*x + btilde(i))/D(i);
         x(i) = max(0, xnew(1));
         lim = mu(i)*x(i);
 
         % Tangent 1
-        xnew = x(i+1*nc) - (A(i+1*nc,:)*x + b(i+1*nc))/D(i+1*nc);
+        xnew = x(i+1*nc) - (A(i+1*nc,:)*x + btilde(i+1*nc))/D(i+1*nc);
         x(i+1*nc) = min(max(-lim, xnew), lim);
 
         % Tangent 2
-        xnew = x(i+2*nc) - (A(i+2*nc,:)*x + b(i+2*nc))/D(i+2*nc);
+        xnew = x(i+2*nc) - (A(i+2*nc,:)*x + btilde(i+2*nc))/D(i+2*nc);
         x(i+2*nc) = min(max(-lim, xnew), lim);
     end
 end
