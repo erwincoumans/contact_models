@@ -29,7 +29,7 @@ u = {@(x) zeros(6, 1)
 N = {6; 6; 6; 6; 21; 6};
 steppers = {@step_sphere; @step_tooltip; @step_tooltip; ...
            @step_bead;   @step_box;     @step_gripper};
-solvers = {@solver_lcp; @solver_blcp; @solver_ccp; @solver_convex};
+solvers = {@solver_ncp; @solver_blcp; @solver_ccp; @solver_convex};
 
 %% Simulations
 [dmean, dmax, dsd] = deal(NaN(numel(steppers), numel(solvers)));
@@ -60,7 +60,7 @@ end
 % e(3).XData = (1:6) + 0.09;
 % e(4).XData = (1:6) + 0.27;
 
-legend('LCP','BLCP','CCP','Convex')
+legend('NCP','BLCP','CCP','Convex')
 ylabel('Discrepancy (m)')
 a = gca;
 a.YScale = 'log';

@@ -17,7 +17,7 @@ N = 51;
 %% Simulation
 time = 0:h:h*(N-1);
 
-params.step_fun = @solver_lcp;
+params.step_fun = @solver_ncp;
 [x1, f1] = stepper(params, @step_bead, x0, u, N);
 params.step_fun = @solver_blcp;
 [x2, f2] = stepper(params, @step_bead, x0, u, N);
@@ -37,7 +37,7 @@ plot(time, x4(4,:), ':')
 plot(time, x5(4,:), '-k')
 hold off
 
-legend('LCP','BLCP','CCP','Convex','Analytic')
+legend('NCP','BLCP','CCP','Convex','Analytic')
 xlabel('Time (sec)')
 ylabel('Sphere Velocity (m/s)')
 a = gca;

@@ -14,7 +14,7 @@ N = 51;
 %% Simulation
 time = 0:h:h*(N-1);
 
-params.step_fun = @solver_lcp;
+params.step_fun = @solver_ncp;
 [x1, f1] = stepper(params, @step_tooltip, x0, u, N);
 params.step_fun = @solver_blcp;
 [x2, f2] = stepper(params, @step_tooltip, x0, u, N);
@@ -32,7 +32,7 @@ plot(x4(1,:), x4(2,:), ':')
 hold off
 axis equal
 
-legend('LCP','BLCP','CCP','Convex')
+legend('NCP','BLCP','CCP','Convex')
 xlabel('Particle X-Position (m)')
 ylabel('Particle Y-Position (m)')
 a = gca;

@@ -15,7 +15,7 @@ time = 0:h:h*(N-1);
 [x1, x2, x3, x4] = deal(repmat(x0, 1, N));
 [f1, f2, f3, f4] = deal(zeros(3, N));
 
-params.step_fun = @solver_lcp;
+params.step_fun = @solver_ncp;
 for k = 2:N
     u = [mu*9.81*m + 5*(0.2 - x1(4,k-1)); 0; 0];
     [x1(:,k), f1(:,k)] = step_tooltip(params, x1(:,k-1), u);
@@ -50,7 +50,7 @@ plot(time, x4(3,:), ':')
 plot(time, x5(3,:), '-k')
 hold off
 
-legend('LCP','BLCP','CCP','Convex','Analytic')
+legend('NCP','BLCP','CCP','Convex','Analytic')
 xlabel('Time (sec)')
 ylabel('Particle Height (m)')
 a = gca;

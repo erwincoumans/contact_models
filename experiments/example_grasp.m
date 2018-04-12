@@ -19,7 +19,7 @@ N = 51;
 %% Simulation
 time = 0:h:h*(N-1);
 
-params.step_fun = @solver_lcp;
+params.step_fun = @solver_ncp;
 [x1, f1] = stepper(params, @step_gripper, x0, u, N);
 params.step_fun = @solver_blcp;
 [x2, f2] = stepper(params, @step_gripper, x0, u, N);
@@ -40,7 +40,7 @@ plot(time, x4(3,:), ':')
 plot(time, x5(3,:), '-k')
 hold off
 
-legend('LCP','BLCP','CCP','Convex','Analytic')
+legend('NCP','BLCP','CCP','Convex','Analytic')
 xlabel('Time (sec)')
 ylabel('Sphere Height (m)')
 a = gca;
@@ -49,7 +49,7 @@ for k = 2:numel(a.Children)
 end
 a.FontSize = 14;
 a.FontWeight = 'bold';
-
+%{
 %% Slip Velocity
 figure(2)
 idx = find(time>=0.2);
@@ -87,3 +87,4 @@ for k = 1:numel(a.Children)
 end
 a.FontSize = 14;
 a.FontWeight = 'bold';
+%}

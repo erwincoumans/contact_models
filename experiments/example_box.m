@@ -19,7 +19,7 @@ N = 201;
 %% Simulation
 time = 0:h:h*(N-1);
 
-params.step_fun = @solver_lcp;
+params.step_fun = @solver_ncp;
 [x1, f1] = stepper(params, @step_box, x0, u, N);
 params.step_fun = @solver_blcp;
 [x2, f2] = stepper(params, @step_box, x0, u, N);
@@ -36,7 +36,7 @@ plot(time, x3(1,:), '--')
 plot(time, x4(1,:), ':')
 hold off
 
-legend('LCP','BLCP','CCP','Convex')
+legend('NCP','BLCP','CCP','Convex')
 xlabel('Time (sec)')
 ylabel('Box X-Position (m)')
 a = gca;

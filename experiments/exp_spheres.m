@@ -12,7 +12,7 @@ time = 0:h:h*(N-1);
 
 ctol = 0.1;
 
-solvers = {@solver_lcp, @solver_blcp, @solver_ccp, @solver_convex};
+solvers = {@solver_ncp, @solver_blcp, @solver_ccp, @solver_convex};
 zs = 1:15;
 
 [res_t, res_p] = deal(NaN(numel(zs), numel(solvers)));
@@ -156,7 +156,7 @@ h_p(2).LineStyle = '-.';
 h_p(3).LineStyle = '--';
 h_p(4).LineStyle = ':';
 
-legend('LCP','BLCP','CCP','Convex')
+legend('NCP','BLCP','CCP','Convex')
 xlabel('Number of Spheres')
 ylabel('Penetration Error (m)')
 a = gca;
@@ -173,7 +173,7 @@ h_p(2).LineStyle = '-.';
 h_p(3).LineStyle = '--';
 h_p(4).LineStyle = ':';
 
-legend('LCP','BLCP','CCP','Convex')
+legend('NCP','BLCP','CCP','Convex')
 xlabel('Number of Spheres')
 ylabel('Computation Time (sec)')
 a = gca;
