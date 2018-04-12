@@ -25,21 +25,18 @@ b = J*(v_prev + M\Fext*h);
 btilde = b + [psi/h; zeros(2*nc,1)];
 
 %% Cone Complementarity Problem (CCP)
-nt = [0, nc, 2*nc]; % normal and tangent indices
+d = diag(A);
+d = mean(reshape(d, nc, 3), 2);
 
-D = zeros(nc,1);
-for i = 1:nc
-    D(i) = trace(A(i+nt, i+nt))/3;
-end
+nto = [0, nc, 2*nc]; % normal and tangent indices
 
 % Solve for contact impulses (Projected Gauss-Seidel)
 x = zeros(3*nc,1);
 for r = 1:30
     for i = 1:nc
         % Block update
-        xnew = x(i+nt) - (A(i+nt,:)*x + btilde(i+nt))/D(i);
-        % Project impulse into friction cone
-        x(i+nt) = project(xnew, mu(i));
+        xnew = x(i+nto) - (A(i+nto,:)*x + btilde(i+nto))/d(i);
+        x(i+nto) = project_cone(xnew, mu(i));
     end
 end
 
@@ -48,21 +45,20 @@ v_next = v_prev + M\(J'*x + Fext*h);
 
 end
 
-function xproj = project(x, mu)
+function xproj = project_cone(x, mu)
 % Project impulse into friction cone
 
 x_n = x(1); % normal
-x_r = norm(x(2:end)); % combined radial
+x_f = norm(x(2:end)); % combined frictional
 
-if x_r <= mu*x_n
+if x_f <= mu*x_n
     % x is already in the cone
     xproj = x;
-elseif x_r <= -x_n/mu
+elseif x_f <= -x_n/mu
     % x is in the polar cone
     xproj = zeros(size(x));
 else
-    pi_n = (x_r*mu + x_n)/(mu^2 + 1);
-    xproj = [pi_n; mu*x(2:end)*pi_n/x_r];
+    pi_n = (x_f*mu + x_n)/(mu^2 + 1);
+    xproj = [pi_n; mu*x(2:end)*pi_n/x_f];
 end
-
 end
