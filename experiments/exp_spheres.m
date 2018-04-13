@@ -156,7 +156,7 @@ h_p(2).LineStyle = '-.';
 h_p(3).LineStyle = '--';
 h_p(4).LineStyle = ':';
 
-legend('NCP','BLCP','CCP','Convex')
+legend({'NCP','BLCP','CCP','Convex'},'Location','Southeast')
 xlabel('Number of Spheres')
 ylabel('Penetration Error (m)')
 a = gca;
@@ -173,7 +173,7 @@ h_p(2).LineStyle = '-.';
 h_p(3).LineStyle = '--';
 h_p(4).LineStyle = ':';
 
-legend('NCP','BLCP','CCP','Convex')
+legend({'NCP','BLCP','CCP','Convex'},'Location','Northwest')
 xlabel('Number of Spheres')
 ylabel('Computation Time (sec)')
 a = gca;
