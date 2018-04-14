@@ -1,4 +1,4 @@
-function plot_spheres(nx, r, q)
+function plot_spheres(q, r, nx, nz)
 n = size(q, 1)/7;
 N = size(q, 2);
 
@@ -6,7 +6,7 @@ m = 11;
 [x, y, z] = sphere(m-1);
 
 X = r*[x(:) y(:) z(:)];
-lims = 3*r*[0 nx 0 nx 0 nx];
+lims = 3*r*[0 nx 0 nx 0 nz];
 
 clf
 hold on
@@ -23,6 +23,7 @@ for i = 1:n
 end
 hold off
 axis(lims)
+axis equal
 
 for k = 1:N
     for i = 1:n
