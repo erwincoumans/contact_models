@@ -21,23 +21,24 @@ A = (A + A')/2; % should be symmetric
 % Resulting contact velocities if all contact impulses are 0
 b = J*(v_prev + M\Fext*h);
 
+% Baumgarte stabilization
+btilde = b + [psi/h; zeros(2*nc,1)];
+
 %% Convex Quadratic Program
 d = diag(A);
 d = mean(reshape(d, nc, 3), 2);
 
 % Parameters
-kappa = 2e-2; % spring-damper time constant
 epsilon = 1e-3; % regularization factor
 r_min = 1e-5; % minimum regularization
+% kappa = 2e-2; % spring-damper time constant
 
-% Spring-damper stabilization
-c_prev = J*v_prev;
-% btilde = b + h*(1 + epsilon)*(2*kappa^(-1)*b + kappa^(-2)*[psi; zeros(2*nc,1)]);
-
-B = 2*(1 + epsilon)/kappa;
-K = (1 + epsilon)/kappa^2;
-bstar = (1 - h*B)*c_prev - h*K*[psi; zeros(2*nc,1)];
-btilde = b - bstar;
+% % Spring-damper stabilization
+% c_prev = J*v_prev;
+% B = 2*(1 + epsilon)/kappa;
+% K = (1 + epsilon)/kappa^2;
+% bstar = (1 - h*B)*c_prev - h*K*[psi; zeros(2*nc,1)];
+% btilde = b - bstar;
 
 % Regularize A
 r = max(d*epsilon, r_min);
