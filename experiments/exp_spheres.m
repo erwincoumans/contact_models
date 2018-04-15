@@ -113,7 +113,6 @@ a.FontWeight = 'bold';
 
 %% (3) Simulate trajectories with different models and stack heights
 solvers = {@solver_ncp, @solver_blcp, @solver_ccp, @solver_convex};
-nmax = 10;
 % MODIFICATION
 %{
 function err = solver_...
@@ -125,81 +124,55 @@ for r = 1:1000
 end
 xs = [xs{:}];
 err = sqrt(sum(bsxfun(@minus, xs, xs(:,end)).^2))/norm(xs(:,end));
+err = min(A(1:nc,:)*xs + btilde(1:nc));
 %}
 
-err = cell(nmax, numel(solvers));
+err = cell(1, numel(solvers));
 
 rng('default')
-for kN = 1:nmax
-    nx = 1;
-    nz = kN;
-    n = nx*nx*nz;
-    
-    M = kron(eye(n), diag(m*[1 1 1 (2/5)*r^2 (2/5)*r^2 (2/5)*r^2]));
-    q0 = init_sphere_configs(r, nx, nz, n);
+nx = 1;
+nz = 4;
+n = nx*nx*nz;
 
-    v = zeros(6*n, 1);
-    q = q0;
-    for k = 2:N
-        [psi, J] = get_sphere_jacobians(q, v, h, r, nx, n);
-        Fext = get_sphere_forces(v, m, r, n);
+M = kron(eye(n), diag(m*[1 1 1 (2/5)*r^2 (2/5)*r^2 (2/5)*r^2]));
+q0 = init_sphere_configs(r, nx, nz, n);
 
-        [v, ~] = solver_lcp(v, Fext, M, J, repmat(mu, size(psi)), psi, h);
+v = zeros(6*n, 1);
+q = q0;
+for k = 2:N
+    [psi, J] = get_sphere_jacobians(q, v, h, r, nx, n);
+    Fext = get_sphere_forces(v, m, r, n);
 
-        for i = 1:n
-            q(7*(i-1)+(1:7)) = int_body(q(7*(i-1)+(1:7)), v(6*(i-1)+(1:6)), h);
-        end
+    [v, ~] = solver_lcp(v, Fext, M, J, repmat(mu, size(psi)), psi, h);
+
+    for i = 1:n
+        q(7*(i-1)+(1:7)) = int_body(q(7*(i-1)+(1:7)), v(6*(i-1)+(1:6)), h);
     end
-    
-    for kS = 1:numel(solvers)
-        [psi, J] = get_sphere_jacobians(q, v, h, r, nx, n);
-        Fext = get_sphere_forces(v, m, r, n);
-        
-        err{kN,kS} = solvers{kS}(v, Fext, M, J, repmat(mu, size(psi)), psi, h);
-    end
-    fprintf('%d\n', n)
 end
 
-em = cell(size(solvers));
 for kS = 1:numel(solvers)
-    em{kS} = cat(1,err{:,kS});
+    [psi, J] = get_sphere_jacobians(q, v, h, r, nx, n);
+    Fext = get_sphere_forces(v, m, r, n);
+
+    err{kS} = solvers{kS}(v, Fext, M, J, repmat(mu, size(psi)), psi, h);
 end
 
-%%
+%% Plot error
+styles = {'-','-.','--',':'};
+clf
 hold on
-colors = 'bgrc';
-for k = 1:4
-surf(em{k},'FaceColor',colors(k),'LineStyle','none')
+for kS = 1:numel(solvers)
+    plot(1:size(err{kS},2), err{kS}, styles{kS})
 end
-a = gca;
-a.ZScale = 'log';
-a.ZDir = 'reverse';
-grid on
+legend({'NCP','BLCP','CCP','Convex'},'Location','Southwest')
 
-legend('NCP','BLCP','CCP','Convex')
 xlabel('Iteration')
-ylabel('Number of Spheres')
-
-% %% Plot error
-% colors = get(groot,'defaultAxesColorOrder');
-% styles = {'-','-.','--',':'};
-% clf
-% hold on
-% % for kS = 1:numel(solvers)
-% %     patch([1:1000, 1000:-1:1], [prctile(em{kS},25), prctile(em{kS}(:,end:-1:1),75)], ...
-% %         colors(kS,:), 'FaceAlpha', 0.2, 'LineStyle', 'none')
-% % end
-% for kS = 1:numel(solvers)
-%     plot(1:size(em{kS},2), median(em{kS},1), styles{kS})%, 'Color', colors(kS,:))
-% end
-% 
-% legend('NCP','BLCP','CCP','Convex')
-% xlabel('Iteration')
-% ylabel('Relative Error')
-% a = gca;
-% for k = 1:numel(a.Children)
-%     a.Children(k).LineWidth = 2;
-% end
-% a.FontSize = 14;
-% a.FontWeight = 'bold';
-% axis([0 100 0 1])
+ylabel('Penetration Error (m)')
+a = gca;
+for k = 1:numel(a.Children)
+    a.Children(k).LineWidth = 2;
+end
+a.YScale = 'log';
+a.YDir = 'reverse';
+set(gcf,'Position',[676   838   333   256])
+ylim([-1e-0 -1e-18])
