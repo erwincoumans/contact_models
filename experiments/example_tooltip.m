@@ -39,22 +39,19 @@ for k = 2:N
     [x4(:,k), f4(:,k)] = step_tooltip(params, x4(:,k-1), u);
 end
 
-x5 = analytic_tooltip(params, x0(4), time);
-
 %% Plotting
 plot(time, x1(3,:), '-')
 hold on
 plot(time, x2(3,:), '-.')
 plot(time, x3(3,:), '--')
 plot(time, x4(3,:), ':')
-plot(time, x5(3,:), '-k')
 hold off
 
-legend('NCP','BLCP','CCP','Convex','Analytic')
+legend('NCP','BLCP','CCP','Convex')
 xlabel('Time (sec)')
 ylabel('Particle Height (m)')
 a = gca;
-for k = 2:numel(a.Children)
+for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;
 end
 a.FontSize = 14;

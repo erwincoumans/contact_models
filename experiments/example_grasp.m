@@ -28,8 +28,6 @@ params.step_fun = @solver_ccp;
 params.step_fun = @solver_convex;
 [x4, f4] = stepper(params, @step_gripper, x0, u, N);
 
-x5 = analytic_gripper(params, u(2), u(5), time);
-
 %% Sphere Height
 figure(1)
 plot(time, x1(3,:), '-')
@@ -37,54 +35,14 @@ hold on
 plot(time, x2(3,:), '-.')
 plot(time, x3(3,:), '--')
 plot(time, x4(3,:), ':')
-plot(time, x5(3,:), '-k')
 hold off
 
-legend('NCP','BLCP','CCP','Convex','Analytic')
+legend('NCP','BLCP','CCP','Convex')
 xlabel('Time (sec)')
 ylabel('Sphere Height (m)')
 a = gca;
-for k = 2:numel(a.Children)
-    a.Children(k).LineWidth = 2;
-end
-a.FontSize = 14;
-a.FontWeight = 'bold';
-%{
-%% Slip Velocity
-figure(2)
-idx = find(time>=0.2);
-plot(time(idx:end),x1(15,idx:end) - x1(23,idx:end), '-')
-hold on
-plot(time(idx:end),x2(15,idx:end) - x2(23,idx:end), '-.')
-plot(time(idx:end),x3(15,idx:end) - x3(23,idx:end), '--')
-hold off
-
-legend('LCP','BLCP','CCP')
-xlabel('Time (sec)')
-ylabel('Slip Velocity (m)')
-a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;
 end
 a.FontSize = 14;
 a.FontWeight = 'bold';
-
-%% Finger Separation
-figure(3)
-plot(time, x1(8,:)-x1(9,:), '-')
-hold on
-plot(time, x2(8,:)-x2(9,:), '-.')
-plot(time, x3(8,:)-x3(9,:), '--')
-plot(time, x4(8,:)-x4(9,:), ':')
-hold off
-
-legend('LCP','BLCP','CCP','Convex')
-xlabel('Time (sec)')
-ylabel('Finger Separation (m)')
-a = gca;
-for k = 1:numel(a.Children)
-    a.Children(k).LineWidth = 2;
-end
-a.FontSize = 14;
-a.FontWeight = 'bold';
-%}
