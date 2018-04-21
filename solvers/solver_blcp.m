@@ -4,11 +4,12 @@ function [v_next, x] = solver_blcp(v_prev, Fext, M, J, mu, psi, h)
 %   Fext - gravitational and other forces [n x 1]
 %   M - inertia matrix [n x n]
 %   J - contact Jacobian [3*nc x n]
+%    (all normal, 1st tangent, and 2nd tangent directions in that order)
 %   mu - coefficients of friction [nc x 1]
 %   psi - contact gap distances [nc x 1]
-%   h - time step
+%   h - time step size
 % Output:
-%   v_prev - velocity [n x 1]
+%   v_next - velocity [n x 1]
 %   x - contact impulses [3*nc x 1]
 
 %% Setup

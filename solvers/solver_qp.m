@@ -4,11 +4,12 @@ function [v_next, x] = solver_qp(v_prev, Fext, M, J, mu, psi, h)
 %   Fext - gravitational and other forces [n x 1]
 %   M - inertia matrix [n x n]
 %   J - contact Jacobian [3*nc x n]
+%    (all normal, 1st tangent, and 2nd tangent directions in that order)
 %   mu - coefficients of friction [nc x 1]
 %   psi - contact gap distances [nc x 1]
-%   h - time step
+%   h - time step size
 % Output:
-%   v_prev - velocity [n x 1]
+%   v_next - velocity [n x 1]
 %   x - contact impulses [3*nc x 1]
 
 %% Setup
@@ -27,18 +28,15 @@ btilde = b + [psi/h; zeros(2*nc,1)];
 %% Convex Quadratic Program
 
 % Contact smoothing
-Rmax = 100*(0.01/h);
-Rmin = 0.01*(0.01/h);
+Rmax = 100;
+Rmin = 0.01;
 wmax = 0.1;
 R = diag(Rmin + (Rmax - Rmin)*[psi; psi; psi]/wmax);
-% R = diag((Rmax - Rmin)/1.7183*(exp([psi; psi; psi]/wmax) - 1) + Rmin);
 
 % Constraints
 Ac = [A(1:nc,:);... % no penetration
       eye(nc)  zeros(nc,2*nc)]; % no attractive contact forces
 bc = [-btilde(1:nc); zeros(nc,1)];
-
-% The substitutions A+R=>A and b=>btilde improve agreement with LCP
 
 % Solve for contact impulses (Interior-point)
 x = interior_point(A + R, b, Ac, bc, mu);

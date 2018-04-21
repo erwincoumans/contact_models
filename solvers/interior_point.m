@@ -1,6 +1,8 @@
 function x0 = interior_point(H, c, A, b, mu)
 % Attempts to solve:
-%   x = argmin 0.5*x'*H*x + x'*c  subject to  A*x >= b and friction cone
+%   x = argmin 0.5*x'*H*x + x'*c  subject to  A*x >= b and friction cones
+%
+% Note: a particular problem structure is assumed of H, c, x, ...
 
 nc = size(mu,1); % number of contacts
 
