@@ -1,13 +1,13 @@
-# Contact Models #
-Description: examples and methods to simulate inelastic rigid-body contact dynamics with Coulomb friction. Companion to the paper:
+### Description ###
+Examples and methods to simulate inelastic rigid-body contact dynamics with Coulomb friction. Companion to the paper:
 P. C. Horak and J. C. Trinkle, "Comparison of Complementarity and Convex Contact Models," arXiv:TBA [cs], May. 2018.
 
 ### Contents ###
-* experiments - scripts to run the simulation experiments (depend on timestepping)
+* **experiments** - scripts to run the simulation experiments (depend on timestepping)
     * **all_examples.m** - reproduces plots from the results section of the paper
-* plotting - animate results from the experiments
-* solvers - solve generic contact dynamics problems
-* timestepping - simulate the dynamics for the experiments (depend on solvers)
+* **plotting** - animate results from the experiments
+* **solvers** - solve generic contact dynamics problems
+* **timestepping** - simulate the dynamics for the experiments (depend on solvers)
 
 ### Solvers ###
 
@@ -36,7 +36,7 @@ E. Todorov, “A convex, smooth and invertible contact model for trajectory opti
 ### Optional Dependencies ###
 
 * lemke.m from the [CompEcon Toolbox](http://www4.ncsu.edu/~pfackler/compecon/toolbox.html)
-* pathlcp.m from <http://pages.cs.wisc.edu/~ferris/path.html>
+* The [PATH Solver](http://pages.cs.wisc.edu/~ferris/path.html)
 
 ### Tested Environments ###
 
