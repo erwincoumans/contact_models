@@ -4,7 +4,7 @@ P. C. Horak and J. C. Trinkle, "Comparison of Complementarity and Convex Contact
 
 ### Contents ###
 * **experiments** - scripts to run the simulation experiments (depend on timestepping)
-    * **all_examples.m** - reproduces plots from the results section of the paper
+    * **generate_results.m** - reproduces plots from the results section of the paper
 * **plotting** - animate results from the experiments
 * **solvers** - solve generic contact dynamics problems
 * **timestepping** - simulate the dynamics for the experiments (depend on solvers)

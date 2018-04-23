@@ -1,4 +1,4 @@
-function [st, x] = step_tooltip(params, st, u)
+function [st, x] = step_particle(params, st, u)
 % st = [x, y, z, ...]
 
 % System parameters

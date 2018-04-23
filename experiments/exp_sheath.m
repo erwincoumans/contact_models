@@ -18,25 +18,25 @@ time = 0:h:h*(N-1);
 params.step_fun = @solver_ncp;
 for k = 2:N
     u = [mu*9.81*m + 5*(0.2 - x1(4,k-1)); 0; 0];
-    [x1(:,k), f1(:,k)] = step_tooltip(params, x1(:,k-1), u);
+    [x1(:,k), f1(:,k)] = step_particle(params, x1(:,k-1), u);
 end
 
 params.step_fun = @solver_blcp;
 for k = 2:N
     u = [mu*9.81*m + 5*(0.2 - x2(4,k-1)); 0; 0];
-    [x2(:,k), f2(:,k)] = step_tooltip(params, x2(:,k-1), u);
+    [x2(:,k), f2(:,k)] = step_particle(params, x2(:,k-1), u);
 end
 
 params.step_fun = @solver_ccp;
 for k = 2:N
     u = [mu*9.81*m + 5*(0.2 - x3(4,k-1)); 0; 0];
-    [x3(:,k), f3(:,k)] = step_tooltip(params, x3(:,k-1), u);
+    [x3(:,k), f3(:,k)] = step_particle(params, x3(:,k-1), u);
 end
 
-params.step_fun = @solver_convex;
+params.step_fun = @solver_qp;
 for k = 2:N
     u = [mu*9.81*m + 5*(0.2 - x4(4,k-1)); 0; 0];
-    [x4(:,k), f4(:,k)] = step_tooltip(params, x4(:,k-1), u);
+    [x4(:,k), f4(:,k)] = step_particle(params, x4(:,k-1), u);
 end
 
 %% Plotting
@@ -47,12 +47,10 @@ plot(time, x3(3,:), '--')
 plot(time, x4(3,:), ':')
 hold off
 
-legend('NCP','BLCP','CCP','Convex')
+legend({'NCP','BLCP','CCP','QP'}, 'Location', 'Northeast')
 xlabel('Time (sec)')
 ylabel('Particle Height (m)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;
 end
-a.FontSize = 14;
-a.FontWeight = 'bold';

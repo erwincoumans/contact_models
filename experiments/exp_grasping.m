@@ -29,7 +29,6 @@ params.step_fun = @solver_convex;
 [x4, f4] = stepper(params, @step_gripper, x0, u, N);
 
 %% Sphere Height
-figure(1)
 plot(time, x1(3,:), '-')
 hold on
 plot(time, x2(3,:), '-.')
@@ -37,12 +36,10 @@ plot(time, x3(3,:), '--')
 plot(time, x4(3,:), ':')
 hold off
 
-legend('NCP','BLCP','CCP','Convex')
+legend({'NCP','BLCP','CCP','Convex'}, 'Location', 'Southeast')
 xlabel('Time (sec)')
 ylabel('Sphere Height (m)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;
 end
-a.FontSize = 14;
-a.FontWeight = 'bold';

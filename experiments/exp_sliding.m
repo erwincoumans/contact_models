@@ -34,12 +34,10 @@ plot(time, x3(4,:), '--')
 plot(time, x4(4,:), ':')
 hold off
 
-legend('NCP','BLCP','CCP','Convex')
+legend({'NCP','BLCP','CCP','Convex'}, 'Location', 'Northwest')
 xlabel('Time (sec)')
 ylabel('Sphere Velocity (m/s)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;
 end
-a.FontSize = 14;
-a.FontWeight = 'bold';
