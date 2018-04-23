@@ -33,17 +33,17 @@ x = zeros(3*nc,1);
 for r = 1:30
     for i = 1:nc
         % Normal (n)
-        xnew = x(i) - (A(i,:)*x + btilde(i))/d(i);
-        x(i) = max(0, xnew);
+        xstar = x(i) - (A(i,:)*x + btilde(i))/d(i);
+        x(i) = max(0, xstar);
         lim = mu(i)*x(i);
 
         % Tangent (t)
-        xnew = x(i+1*nc) - (A(i+1*nc,:)*x + btilde(i+1*nc))/d(i+1*nc);
-        x(i+1*nc) = min(max(-lim, xnew), lim);
+        xstar = x(i+1*nc) - (A(i+1*nc,:)*x + btilde(i+1*nc))/d(i+1*nc);
+        x(i+1*nc) = min(max(-lim, xstar), lim);
 
         % Tangent (o)
-        xnew = x(i+2*nc) - (A(i+2*nc,:)*x + btilde(i+2*nc))/d(i+2*nc);
-        x(i+2*nc) = min(max(-lim, xnew), lim);
+        xstar = x(i+2*nc) - (A(i+2*nc,:)*x + btilde(i+2*nc))/d(i+2*nc);
+        x(i+2*nc) = min(max(-lim, xstar), lim);
     end
 end
 

@@ -36,12 +36,12 @@ x = zeros(3*nc,1);
 for r = 1:30
     for i = 1:nc
         % Normal
-        xnew = x(i) - (A(i,:)*x + btilde(i))/d(i);
-        x(i) = max(0, xnew);
+        xstar = x(i) - (A(i,:)*x + btilde(i))/d(i);
+        x(i) = max(0, xstar);
 
         % Friction
-        xnew = x(i+to) - (A(i+to,:)*x + btilde(i+to))/d(i+nc);
-        x(i+to) = project_circle(xnew, mu(i)*x(i));
+        xstar = x(i+to) - (A(i+to,:)*x + btilde(i+to))/d(i+nc);
+        x(i+to) = project_circle(xstar, mu(i)*x(i));
     end
 end
 
@@ -49,7 +49,6 @@ end
 v_next = v_prev + M\(J'*x + Fext*h);
 
 end
-
 
 function xproj = project_circle(x, r)
 % Project frictional impulse into a circle of radius r

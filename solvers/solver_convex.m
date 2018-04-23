@@ -53,8 +53,8 @@ x = zeros(3*nc,1);
 for r = 1:30
     for i = 1:nc
         % Block update
-        xnew = x(i+nto) - (A(i+nto,:)*x + btilde(i+nto))/d(i);
-        x(i+nto) = project_cone(xnew, mu(i));
+        xstar = x(i+nto) - (A(i+nto,:)*x + btilde(i+nto))/d(i);
+        x(i+nto) = project_cone(xstar, mu(i));
     end
 end
 
