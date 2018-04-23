@@ -7,7 +7,7 @@ y = r*y;
 z = r*z;
 
 % Plotting
-lims = [-2*r 2*r -2*r 2*r -1.1*w 1.1*w];
+lims = [-1*r 2*r -2*r 2*r -1.1*w 1.1*w];
 clf
 hf = gcf;
 patch(lims([1 2 2 1]), lims([3 3 4 4]),-w*ones(1,4), 0.8+[0 0 0]);
@@ -28,7 +28,7 @@ end
 hold off
 axis equal
 axis(lims)
-view(12,2)
+view(0,0)
 
 if (nargin < 5)
     filename = '';
