@@ -1,7 +1,4 @@
-% Grasp using constant control inputs.
-
-% Note: with convex contact model, the gripper opens a bit when it hits
-% the high stop. Larger h exacerbates the issue.
+% Grasp and lift a sphere.
 clear
 
 % Parameters

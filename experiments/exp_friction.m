@@ -1,4 +1,4 @@
-% Cartesian DOF tool (effectively a particle) and a plane.
+% Slide a particle along a plane to illustrate friction cone approximations.
 clear
 
 % Parameters

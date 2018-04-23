@@ -1,4 +1,4 @@
-% Cartesian DOF tool (effectively a particle) and a plane.
+% Slide a particle at a constant velocity to measure sheath effects.
 clear
 
 % Parameters

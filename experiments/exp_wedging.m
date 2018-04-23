@@ -1,4 +1,4 @@
-% Box between two planes.
+% Wedge a box between two planes to illustrate slip.
 clear
 
 % Parameters

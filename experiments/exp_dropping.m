@@ -1,4 +1,4 @@
-% Sphere and a plane.
+% Drop a sphere onto a plane to illustrate contact smoothing.
 clear
 
 % Parameters

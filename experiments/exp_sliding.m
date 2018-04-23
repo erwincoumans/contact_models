@@ -1,4 +1,5 @@
-% Sphere with fixed orientation between two planes.
+% Slide a sphere with a fixed orientation between two planes to illustrate
+% sheath effects.
 clear
 
 % Parameters

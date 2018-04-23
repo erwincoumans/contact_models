@@ -1,4 +1,4 @@
-% Spheres in a box.
+% Stack spheres in a box to characterize solver error.
 clear
 
 % Parameters
