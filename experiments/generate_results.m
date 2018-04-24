@@ -18,3 +18,10 @@ exp_grasping
 f = figure();
 plot_gripper(params, st4(:,17), x4(:,17))
 f.Position(1:2) = [800 450];
+
+exp_stacking
+
+if (exist('lemke','file') == 2)
+    figure('Position',[1500 450 333 256])
+    exp_stacking_err
+end

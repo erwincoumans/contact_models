@@ -1,4 +1,4 @@
-% Stack spheres in a box to characterize solver error.
+% Stack spheres in a box to test scaling behaviors.
 clear
 
 % Parameters
@@ -8,37 +8,7 @@ m = 0.2;
 r = 0.05;
 N = 101;
 
-%% (1) Simulate one trajectory
-time = 0:h:h*(N-1);
-
-nx = 1;
-nz = 4;
-n = nx*nx*nz;
-
-rng('default')
-M = kron(eye(n), diag(m*[1 1 1 (2/5)*r^2 (2/5)*r^2 (2/5)*r^2]));
-q = init_sphere_configs(r, nx, nz, n);
-
-v = zeros(6*n, 1);
-qs = cell(1, N);
-qs{1} = q;
-for k = 2:N
-    [psi, J] = get_sphere_jacobians(q, v, h, r, nx, n);
-    Fext = get_sphere_forces(v, m, r, n);
-
-    [v, ~] = solver_blcp(v, Fext, M, J, repmat(mu, size(psi)), psi, h);
-
-    for i = 1:n
-        q(7*(i-1)+(1:7)) = int_body(q(7*(i-1)+(1:7)), v(6*(i-1)+(1:6)), h);
-    end
-    qs{k} = q;
-end
-qs = [qs{:}];
-
-% Animation
-plot_spheres(qs, r, nx, nz);
-
-%% (2) Simulate trajectories with different models and stack heights
+%% Simulate trajectories with different models and stack heights
 solvers = {@solver_ncp, @solver_blcp, @solver_ccp, @solver_convex};
 nmax = 15;
 
@@ -46,8 +16,8 @@ nmax = 15;
 
 rng('default')
 for kN = 1:nmax
-    nx = 1;
-    nz = kN;
+    nx = 1; % stack width
+    nz = kN; % stack height
     n = nx*nx*nz;
     
     M = kron(eye(n), diag(m*[1 1 1 (2/5)*r^2 (2/5)*r^2 (2/5)*r^2]));
@@ -64,115 +34,78 @@ for kN = 1:nmax
             tic
             [v, ~] = solvers{kS}(v, Fext, M, J, repmat(mu, size(psi)), psi, h);
             ttot = ttot + toc;
-
+            
             for i = 1:n
                 q(7*(i-1)+(1:7)) = int_body(q(7*(i-1)+(1:7)), v(6*(i-1)+(1:6)), h);
             end
         end
         tsolve(kN, kS) = ttot;
         perr(kN, kS) = min(psi);
-        fprintf('%s\t%d\t%g\t%g\n', func2str(solvers{kS}), n, ttot, min(psi))
+        fprintf('%s\t%d\t%.2f\t%e\n', func2str(solvers{kS}), n, ttot, min(psi))
     end
 end
 
 % Plot penetration error
-figure(1)
-h_p = semilogy(1:nmax,-min(perr,0));
-h_p(1).LineStyle = '-';
-h_p(2).LineStyle = '-.';
-h_p(3).LineStyle = '--';
-h_p(4).LineStyle = ':';
+figure('Position',[1150 100 333 256])
+hp = semilogy(1:nmax, -min(perr,0));
+hp(1).LineStyle = '-';
+hp(2).LineStyle = '-.';
+hp(3).LineStyle = '--';
+hp(4).LineStyle = ':';
 
-legend({'NCP','BLCP','CCP','Convex'},'Location','Southeast')
+legend({'NCP','BLCP','CCP','Convex'}, 'Location', 'Southeast')
 xlabel('Number of Spheres')
 ylabel('Penetration Error (m)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;
 end
-a.FontSize = 14;
-a.FontWeight = 'bold';
 
 % Plot computation times
-figure(2)
-h_p = plot(1:nmax,tsolve);
-h_p(1).LineStyle = '-';
-h_p(2).LineStyle = '-.';
-h_p(3).LineStyle = '--';
-h_p(4).LineStyle = ':';
+figure('Position',[1500 100 333 256])
+hp = plot(1:nmax, tsolve);
+hp(1).LineStyle = '-';
+hp(2).LineStyle = '-.';
+hp(3).LineStyle = '--';
+hp(4).LineStyle = ':';
 
-legend({'NCP','BLCP','CCP','Convex'},'Location','Northwest')
+legend({'NCP','BLCP','CCP','Convex'}, 'Location', 'Northwest')
 xlabel('Number of Spheres')
 ylabel('Computation Time (sec)')
 a = gca;
 for k = 1:numel(a.Children)
     a.Children(k).LineWidth = 2;
 end
-a.FontSize = 14;
-a.FontWeight = 'bold';
 
-%% (3) Simulate trajectories with different models and stack heights
-solvers = {@solver_ncp, @solver_blcp, @solver_ccp, @solver_convex};
-% MODIFICATION
-%{
-function err = solver_...
-...
-xs = cell(1,1000);
-for r = 1:1000
-    xs{r} = x;
-    ...
-end
-xs = [xs{:}];
-err = sqrt(sum(bsxfun(@minus, xs, xs(:,end)).^2))/norm(xs(:,end));
-err = min(A(1:nc,:)*xs + btilde(1:nc));
-%}
+%% Simulate one trajectory
+time = 0:h:h*(N-1);
 
-err = cell(1, numel(solvers));
-
-rng('default')
-nx = 1;
-nz = 4;
+nx = 1; % stack width
+nz = 4; % stack height
 n = nx*nx*nz;
 
+rng('default')
 M = kron(eye(n), diag(m*[1 1 1 (2/5)*r^2 (2/5)*r^2 (2/5)*r^2]));
-q0 = init_sphere_configs(r, nx, nz, n);
+q = init_sphere_configs(r, nx, nz, n);
 
 v = zeros(6*n, 1);
-q = q0;
+qs = cell(1, N);
+qs{1} = q;
 for k = 2:N
     [psi, J] = get_sphere_jacobians(q, v, h, r, nx, n);
     Fext = get_sphere_forces(v, m, r, n);
-
-    [v, ~] = solver_lcp(v, Fext, M, J, repmat(mu, size(psi)), psi, h);
-
+    
+    [v, ~] = solver_convex(v, Fext, M, J, repmat(mu, size(psi)), psi, h);
+    
     for i = 1:n
         q(7*(i-1)+(1:7)) = int_body(q(7*(i-1)+(1:7)), v(6*(i-1)+(1:6)), h);
     end
+    qs{k} = q;
 end
+qs = [qs{:}];
 
-for kS = 1:numel(solvers)
-    [psi, J] = get_sphere_jacobians(q, v, h, r, nx, n);
-    Fext = get_sphere_forces(v, m, r, n);
-
-    err{kS} = solvers{kS}(v, Fext, M, J, repmat(mu, size(psi)), psi, h);
-end
-
-%% Plot error
-styles = {'-','-.','--',':'};
-clf
-hold on
-for kS = 1:numel(solvers)
-    plot(1:size(err{kS},2), err{kS}, styles{kS})
-end
-legend({'NCP','BLCP','CCP','Convex'},'Location','Southwest')
-
-xlabel('Iteration')
-ylabel('Penetration Error (m)')
-a = gca;
-for k = 1:numel(a.Children)
-    a.Children(k).LineWidth = 2;
-end
-a.YScale = 'log';
-a.YDir = 'reverse';
-set(gcf,'Position',[676   838   333   256])
-ylim([-1e-0 -1e-18])
+% Animation
+f = figure();
+params = struct('h', h, 'r', r, 'nx', nx, 'nz', 8/3);
+plot_spheres(params, qs(:,21));
+f.Position(1:2) = [1150 450];
