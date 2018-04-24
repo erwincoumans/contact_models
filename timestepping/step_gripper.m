@@ -5,7 +5,7 @@ function [st, x] = step_gripper(params, st, u)
 h = params.h;
 mu = params.mu;
 m = params.m; % sphere mass
-r = params.r; % sphere amss
+r = params.r; % sphere radius
 m_g = params.m_g; % gripper finger mass
 step_fun = params.step_fun;
 

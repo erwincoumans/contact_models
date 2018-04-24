@@ -12,7 +12,7 @@ w = 0.021;
 
 params = struct('h', h, 'mu', mu, 'm', m, 'lx', lx, 'ly', ly, 'lz', lz, 'w', w, 'step_fun', []);
 
-x0 = [0, 0, lz-w, 1, 0, 0, 0, zeros(1, 6)]';
+st0 = [0, 0, lz-w, 1, 0, 0, 0, zeros(1, 6)]';
 u = [2, 0, 0, 0, 0, 0]';
 N = 201;
 
@@ -20,20 +20,20 @@ N = 201;
 time = 0:h:h*(N-1);
 
 params.step_fun = @solver_ncp;
-[x1, f1] = stepper(params, @step_box, x0, u, N);
+[st1, x1] = stepper(params, @step_box, st0, u, N);
 params.step_fun = @solver_blcp;
-[x2, f2] = stepper(params, @step_box, x0, u, N);
+[st2, x2] = stepper(params, @step_box, st0, u, N);
 params.step_fun = @solver_ccp;
-[x3, f3] = stepper(params, @step_box, x0, u, N);
+[st3, x3] = stepper(params, @step_box, st0, u, N);
 params.step_fun = @solver_convex;
-[x4, f4] = stepper(params, @step_box, x0, u, N);
+[st4, x4] = stepper(params, @step_box, st0, u, N);
 
 %% Plotting
-plot(time, x1(1,:), '-')
+plot(time, st1(1,:), '-')
 hold on
-plot(time, x2(1,:), '-.')
-plot(time, x3(1,:), '--')
-plot(time, x4(1,:), ':')
+plot(time, st2(1,:), '-.')
+plot(time, st3(1,:), '--')
+plot(time, st4(1,:), ':')
 hold off
 
 legend({'NCP','BLCP','CCP','Convex'}, 'Location', 'Southeast')

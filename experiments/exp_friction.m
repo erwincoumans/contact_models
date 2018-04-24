@@ -7,7 +7,7 @@ mu = 0.3;
 m = 0.2;
 params = struct('h', h, 'mu', mu, 'm', m, 'step_fun', []);
 
-x0 = zeros(6,1);
+st0 = zeros(6,1);
 u = [-1, 0.8, 0]';
 N = 51;
 
@@ -15,20 +15,20 @@ N = 51;
 time = 0:h:h*(N-1);
 
 params.step_fun = @solver_ncp;
-[x1, f1] = stepper(params, @step_particle, x0, u, N);
+[st1, x1] = stepper(params, @step_particle, st0, u, N);
 params.step_fun = @solver_blcp;
-[x2, f2] = stepper(params, @step_particle, x0, u, N);
+[st2, x2] = stepper(params, @step_particle, st0, u, N);
 params.step_fun = @solver_ccp;
-[x3, f3] = stepper(params, @step_particle, x0, u, N);
+[st3, x3] = stepper(params, @step_particle, st0, u, N);
 params.step_fun = @solver_lcp;
-[x4, f4] = stepper(params, @step_particle, x0, u, N);
+[st4, x4] = stepper(params, @step_particle, st0, u, N);
 
 %% Plotting
-plot(x1(1,:), x1(2,:), '-')
+plot(st1(1,:), st1(2,:), '-')
 hold on
-plot(x2(1,:), x2(2,:), '-.')
-plot(x3(1,:), x3(2,:), '--')
-plot(x4(1,:), x4(2,:), ':')
+plot(st2(1,:), st2(2,:), '-.')
+plot(st3(1,:), st3(2,:), '--')
+plot(st4(1,:), st4(2,:), ':')
 hold off
 axis equal
 

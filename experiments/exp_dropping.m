@@ -8,7 +8,7 @@ m = 0.2;
 r = 0.05;
 params = struct('h', h, 'mu', mu, 'm', m, 'r', r, 'step_fun', []);
 
-x0 = [0, 0, r+0.15, 1, 0, 0, 0, zeros(1, 6)]';
+st0 = [0, 0, r+0.15, 1, 0, 0, 0, zeros(1, 6)]';
 u = zeros(6, 1);
 N = 51;
 
@@ -16,20 +16,20 @@ N = 51;
 time = 0:h:h*(N-1);
 
 params.step_fun = @solver_ncp;
-[x1, f1] = stepper(params, @step_sphere, x0, u, N);
+[st1, x1] = stepper(params, @step_sphere, st0, u, N);
 params.step_fun = @solver_blcp;
-[x2, f2] = stepper(params, @step_sphere, x0, u, N);
+[st2, x2] = stepper(params, @step_sphere, st0, u, N);
 params.step_fun = @solver_ccp;
-[x3, f3] = stepper(params, @step_sphere, x0, u, N);
+[st3, x3] = stepper(params, @step_sphere, st0, u, N);
 params.step_fun = @solver_qp;
-[x4, f4] = stepper(params, @step_sphere, x0, u, N);
+[st4, x4] = stepper(params, @step_sphere, st0, u, N);
 
 %% Plotting
-plot(time, x1(3,:), '-')
+plot(time, st1(3,:), '-')
 hold on
-plot(time, x2(3,:), '-.')
-plot(time, x3(3,:), '--')
-plot(time, x4(3,:), ':')
+plot(time, st2(3,:), '-.')
+plot(time, st3(3,:), '--')
+plot(time, st4(3,:), ':')
 hold off
 
 legend({'NCP','BLCP','CCP','QP'}, 'Location', 'Northeast')
