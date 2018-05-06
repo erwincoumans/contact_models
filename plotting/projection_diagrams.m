@@ -89,7 +89,7 @@ title('CCP')
 
 %% Formatting
 % Plot sizes
-set(gcf,'Position',[300 700 550 250])
+set(gcf,'Position',[100 100 550 250])
 s(1).Position = [0/3 0 1/3-0.05 0.85];
 s(2).Position = [1/3 0 1/3-0.05 0.85];
 s(3).Position = [2/3 0 1/3-0.05 0.85];
